@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+﻿using SequenceClicker.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -35,99 +35,149 @@ namespace SequenceClicker
         {
             InitializeComponent();
             this.task = task;
-            lb_EditClick.Visibility = Visibility.Collapsed;
-            lb_Click.Visibility = Visibility.Collapsed;
-            TB_Click.Visibility = Visibility.Collapsed;
-            Tog_Click.Visibility = Visibility.Collapsed;
-
-
-            lb_EditDelay.Visibility = Visibility.Collapsed;
-            lb_dmin.Visibility = Visibility.Collapsed;
-            lb_dsec.Visibility = Visibility.Collapsed;
-            tb_dmin.Visibility = Visibility.Collapsed;
-            tb_dsec.Visibility = Visibility.Collapsed;
-            
-            lb_EditMove.Visibility = Visibility.Collapsed;
-            lb_X.Visibility = Visibility.Collapsed;
-            lb_Y.Visibility = Visibility.Collapsed;
-            TB_X.Visibility = Visibility.Collapsed;
-            TB_Y.Visibility = Visibility.Collapsed;
-            btn_Auto.Visibility = Visibility.Collapsed;
-            btn_Test.Visibility = Visibility.Collapsed;
-
+            ClickVis();
+            DelayVis();
+            MoveVis();
+            TimedVis();
 
             prep(task);
             Update();
         }
-
-        private void prep(MyTask task)
+        #region UI updater
+        #region Visibilitys
+        private void ClickVis()
         {
-            switch (task)
+            if (lb_EditClick.Visibility == Visibility.Visible)
             {
-                case ClickTask click: Click(task as ClickTask); break;
-                case DelayTask delay: Delay(task as DelayTask); break;
-                case MoveTask move: Move(task as MoveTask); break;
-                default: MessageBox.Show($"Unknown Task.\n{task.GetType()} does not exist.", "Error while executing", MessageBoxButton.OK, MessageBoxImage.Error); break;
+                lb_EditClick.Visibility = Visibility.Collapsed;
+                lb_Click.Visibility = Visibility.Collapsed;
+                TB_Click.Visibility = Visibility.Collapsed;
+                Tog_Click.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                lb_EditClick.Visibility = Visibility.Visible;
+                lb_Click.Visibility = Visibility.Visible;
+                TB_Click.Visibility = Visibility.Visible;
+                Tog_Click.Visibility = Visibility.Visible;
             }
         }
-        private void Click(ClickTask task)
+        private void DelayVis()
         {
-            lb_EditClick.Visibility = Visibility.Visible;
-            lb_Click.Visibility = Visibility.Visible;
-            TB_Click.Visibility = Visibility.Visible;
-            Tog_Click.Visibility = Visibility.Visible;
-
-            TB_Click.IsEnabled = true;
-            Tog_Click.IsEnabled = true;
-            TB_Click.Text = task.Repeats.ToString();
-
-            if (task._Delay > 0)
+            if (lb_dmin.Visibility == Visibility.Visible)
+            {
+                lb_EditDelay.Visibility = Visibility.Collapsed;
+                lb_dmin.Visibility = Visibility.Collapsed;
+                lb_dsec.Visibility = Visibility.Collapsed;
+                tb_dmin.Visibility = Visibility.Collapsed;
+                tb_dsec.Visibility = Visibility.Collapsed;
+            }
+            else if (lb_EditClick.Visibility == Visibility.Visible)
             {
                 lb_dmin.Visibility = Visibility.Visible;
                 lb_dsec.Visibility = Visibility.Visible;
                 tb_dmin.Visibility = Visibility.Visible;
                 tb_dsec.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                lb_EditDelay.Visibility = Visibility.Visible;
+                lb_dmin.Visibility = Visibility.Visible;
+                lb_dsec.Visibility = Visibility.Visible;
+                tb_dmin.Visibility = Visibility.Visible;
+                tb_dsec.Visibility = Visibility.Visible;
+            }
+        }
+        private void MoveVis()
+        {
+            if (lb_EditMove.Visibility == Visibility.Visible)
+            {
+                lb_EditMove.Visibility = Visibility.Collapsed;
+                lb_X.Visibility = Visibility.Collapsed;
+                lb_Y.Visibility = Visibility.Collapsed;
+                TB_X.Visibility = Visibility.Collapsed;
+                TB_Y.Visibility = Visibility.Collapsed;
+                btn_Auto.Visibility = Visibility.Collapsed;
+                btn_Test.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                lb_EditMove.Visibility = Visibility.Visible;
+                lb_X.Visibility = Visibility.Visible;
+                lb_Y.Visibility = Visibility.Visible;
+                TB_X.Visibility = Visibility.Visible;
+                TB_Y.Visibility = Visibility.Visible;
+                btn_Auto.Visibility = Visibility.Visible;
+                btn_Test.Visibility = Visibility.Visible;
+            }
+        }
+        private void TimedVis()
+        {
+            if (lb_TimedDelay.Visibility == Visibility.Visible)
+            {
+                lb_TimedDelay.Visibility = Visibility.Collapsed;
+                lb_tmin.Visibility = Visibility.Collapsed;
+                lb_tsec.Visibility = Visibility.Collapsed;
+                tb_tmin.Visibility = Visibility.Collapsed;
+                tb_tsec.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                lb_TimedDelay.Visibility = Visibility.Visible;
+                lb_tmin.Visibility = Visibility.Visible;
+                lb_tsec.Visibility = Visibility.Visible;
+                tb_tmin.Visibility = Visibility.Visible;
+                tb_tsec.Visibility = Visibility.Visible;
+            }
+        }
+        #endregion
+        #region UI setter
+        private void Click(ClickTask task)
+        {
+            ClickVis();
+            TB_Click.IsEnabled = true;
+            Tog_Click.IsEnabled = true;
+            TB_Click.Text = task.Repeats.ToString();
 
+            if (task.Delay > 0)
+            {
+                DelayVis();
                 tb_dmin.Margin = new Thickness(45, 71, 0, 0);
                 tb_dsec.Margin = new Thickness(135, 71, 0, 0);
                 lb_dmin.Margin = new Thickness(10, 67, 0, 0);
                 lb_dsec.Margin = new Thickness(100, 71, 0, 0);
                 tb_dmin.IsEnabled = true;
                 tb_dsec.IsEnabled = true;
-                int min = (int)(task._Delay / 60);
-                int sec = (int)(task._Delay % 60);
+                double time = (double)task.Delay / 1000d;
+                double min = 0;
+                if (time > 60)
+                    min = (time / 60d);
+                double sec = (time % 60d);
                 tb_dmin.Text = min.ToString();
                 tb_dsec.Text = sec.ToString();
             }
-            if (!task.Leftclick)
+            if (!task.IsLeftclick)
             {
                 Tog_Click.IsChecked = true;
             }
         }
         private void Delay(DelayTask task)
         {
-            lb_EditDelay.Visibility = Visibility.Visible;
-            lb_dmin.Visibility = Visibility.Visible;
-            lb_dsec.Visibility = Visibility.Visible;
-            tb_dmin.Visibility = Visibility.Visible;
-            tb_dsec.Visibility = Visibility.Visible;
+            DelayVis();
 
             tb_dmin.IsEnabled = true;
             tb_dsec.IsEnabled = true;
-            int min = (int)(task.Delay / 60);
-            int sec = (int)(task.Delay % 60);
+            double time = (double)task.Delay / 1000d;
+            double min = 0;
+            if (time > 60)
+                min = (time / 60d);
+            double sec = (time % 60d);
             tb_dmin.Text = min.ToString();
             tb_dsec.Text = sec.ToString();
         }
         private void Move(MoveTask task)
         {
-            lb_EditMove.Visibility = Visibility.Visible;
-            lb_X.Visibility = Visibility.Visible;
-            lb_Y.Visibility = Visibility.Visible;
-            TB_X.Visibility = Visibility.Visible;
-            TB_Y.Visibility = Visibility.Visible;
-            btn_Auto.Visibility = Visibility.Visible;
-            btn_Test.Visibility = Visibility.Visible;
+            MoveVis();
 
             TB_X.IsEnabled = true;
             TB_Y.IsEnabled = true;
@@ -136,78 +186,22 @@ namespace SequenceClicker
             TB_X.Text = task.XPos.ToString();
             TB_Y.Text = task.YPos.ToString();
         }
-
-        private static readonly Regex _regexDeci = new Regex("[^0-9,]+");
-        private void PosDeci(object sender, TextCompositionEventArgs e)
+        private void Timed(TimedTask task)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            // Block invalid characters
-            if (_regexDeci.IsMatch(e.Text))
-            {
-                e.Handled = true;
-                return;
-            }
 
-            // Allow comma only once
-            if (e.Text == "," && textBox.Text.Contains(","))
+        }
+        #endregion
+        private void prep(MyTask task)
+        {
+            switch (task)
             {
-                e.Handled = true;
+                case ClickTask click: Click(task as ClickTask); break;
+                case DelayTask delay: Delay(task as DelayTask); break;
+                case MoveTask move: Move(task as MoveTask); break;
+                case TimedTask Time: Timed(task as TimedTask); break;
+                default: MessageBox.Show($"Unknown Task.\n{task.GetType()} does not exist.", "Error while executing", MessageBoxButton.OK, MessageBoxImage.Error); break;
             }
         }
-        private static readonly Regex _regexPos = new Regex("[^0-9]+");
-        private void Pos(object sender, TextCompositionEventArgs e)
-        {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            // Block invalid characters
-            if (_regexPos.IsMatch(e.Text))
-            {
-                e.Handled = true;
-                return;
-            }
-        }
-        private static readonly Regex _regexPosNeg = new Regex("[^0-9+-]+");
-        private void PosNeg(object sender, TextCompositionEventArgs e)
-        {
-            var textBox = sender as System.Windows.Controls.TextBox;
-
-            // Block anything that's not digit, +, or -
-            if (_regexPosNeg.IsMatch(e.Text))
-            {
-                e.Handled = true;
-                return;
-            }
-
-            // Only allow + or - at the beginning, and only once
-            if ((e.Text == "+" || e.Text == "-"))
-            {
-                // Not at the beginning? reject
-                if (textBox.SelectionStart != 0)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                // Already has + or -? reject
-                if (textBox.Text.StartsWith("+") || textBox.Text.StartsWith("-"))
-                {
-                    e.Handled = true;
-                    return;
-                }
-            }
-        }
-
-        private void Tog_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (Tog_Click.IsChecked == true)
-            {
-                Tog_Click.ToolTip = "Leftclick?";
-            }
-            else
-            {
-                Tog_Click.ToolTip = "Rightclick?";
-            }
-        }
-
         private void Update(object sender, TextChangedEventArgs e)
         {
             Update();
@@ -232,89 +226,57 @@ namespace SequenceClicker
         }
         private void Check_Click()
         {
-            click = false;
-            try
+            if (uint.TryParse(TB_Click.Text.Trim(), out uint rep) && rep > 1)
             {
-                if (uint.Parse(TB_Click.Text.Trim()) > 1)
-                {
-                    lb_dmin.Visibility = Visibility.Visible;
-                    lb_dsec.Visibility = Visibility.Visible;
-                    tb_dmin.Visibility = Visibility.Visible;
-                    tb_dsec.Visibility = Visibility.Visible;
+                lb_dmin.Visibility = Visibility.Visible;
+                lb_dsec.Visibility = Visibility.Visible;
+                tb_dmin.Visibility = Visibility.Visible;
+                tb_dsec.Visibility = Visibility.Visible;
 
-                    tb_dmin.Margin = new Thickness(45, 71, 0, 0);
-                    tb_dsec.Margin = new Thickness(135, 71, 0, 0);
-                    lb_dmin.Margin = new Thickness(10, 67, 0, 0);
-                    lb_dsec.Margin = new Thickness(100, 71, 0, 0);
-                    tb_dmin.IsEnabled = true;
-                    tb_dsec.IsEnabled = true;
-                }
-                else
-                {
-                    lb_dmin.Visibility = Visibility.Collapsed;
-                    lb_dsec.Visibility = Visibility.Collapsed;
-                    tb_dmin.Visibility = Visibility.Collapsed;
-                    tb_dsec.Visibility = Visibility.Collapsed;
-                }
-                if (uint.Parse(TB_Click.Text.Trim()) == 1)
-                {
-                    click = true;
-                }
-                else if (uint.Parse(TB_Click.Text.Trim()) > 1 && delay)
-                {
-                    click = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
+                tb_dmin.Margin = new Thickness(45, 71, 0, 0);
+                tb_dsec.Margin = new Thickness(135, 71, 0, 0);
+                lb_dmin.Margin = new Thickness(10, 67, 0, 0);
+                lb_dsec.Margin = new Thickness(100, 71, 0, 0);
+                tb_dmin.IsEnabled = true;
+                tb_dsec.IsEnabled = true;
+                delay = DelayTask.ValidInput(tb_dmin.Text, tb_dsec.Text);
+                click = ClickTask.ValidInput(TB_Click.Text, delay);
             }
-            catch
+            else
             {
-                click = false;
+                lb_dmin.Visibility = Visibility.Collapsed;
+                lb_dsec.Visibility = Visibility.Collapsed;
+                tb_dmin.Visibility = Visibility.Collapsed;
+                tb_dsec.Visibility = Visibility.Collapsed;
+                delay = true;
+                click = ClickTask.ValidInput(TB_Click.Text, delay);
             }
         }
 
         private void Check_Delay()
         {
-            delay = false;
-            try
-            {
-                if ((double.TryParse(tb_dmin.Text.Trim(), out double d) && d > 0) || (double.TryParse(tb_dsec.Text.Trim(), out double q) && q > 0))
-                {
-                    delay = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
-            }
-            catch
-            {
-                delay = false;
-            }
+            delay = DelayTask.ValidInput(tb_dmin.Text, tb_dsec.Text);
         }
-
         private void Check_Move()
         {
-            move = false;
-            try
-            {
-                if (int.TryParse(TB_X.Text.Trim(), out int x) && int.TryParse(TB_Y.Text.Trim(), out int y))
-                {
-                    move = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
-            }
-            catch
-            {
-                move = false;
-            }
+            move = MoveTask.ValidInput(TB_X.Text, TB_Y.Text);
         }
-
+        #endregion
+        #region Regex Input Handler
+        private void PosDeci(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.PosDeci(sender, e);
+        }
+        private void Pos(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.Pos(sender, e);
+        }
+        private void PosNeg(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.PosNeg(sender, e);
+        }
+        #endregion
+        #region Button
         private void btn_Test_Click(object sender, RoutedEventArgs e)
         {
             SetCursorPos(int.Parse(TB_X.Text), int.Parse(TB_Y.Text));
@@ -331,6 +293,58 @@ namespace SequenceClicker
             TB_Y.Text = p.Y.ToString();
             btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
         }
+
+
+        private void OK_Click(object sender, RoutedEventArgs e)
+        {
+            if (task is ClickTask click)
+            {
+                click.IsLeftclick = Tog_Click.IsChecked == true ? false : true;
+                if(int.TryParse(TB_Click.Text.Trim(), out int rep) && rep > 1)
+                {
+                    click.Repeats = rep;
+                    try
+                    {
+                        click.Delay = (int)((double.Parse(tb_dmin.Text.Trim()) * 60 + double.Parse(tb_dsec.Text.Trim())) * 1000);
+                    }
+                    catch (OverflowException ex)
+                    {
+                        click.Delay = int.MaxValue;
+                    }
+                }
+            }
+
+            if (task is DelayTask delay)
+            {
+                try
+                {
+                    delay.Delay = (int)((double.Parse(tb_dmin.Text.Trim()) * 60 + double.Parse(tb_dsec.Text.Trim())) * 1000);
+                }
+                catch (OverflowException ex)
+                {
+                    delay.Delay = int.MaxValue;
+                }
+            }
+
+            if (task is MoveTask move)
+            {
+                move.XPos = int.Parse(TB_X.Text.Trim());
+                move.YPos = int.Parse(TB_Y.Text.Trim());
+            }
+            EditingWindow.Close();
+        }
+        private void Tog_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (Tog_Click.IsChecked == true)
+            {
+                Tog_Click.ToolTip = "Leftclick?";
+            }
+            else
+            {
+                Tog_Click.ToolTip = "Rightclick?";
+            }
+        }
+        #endregion
         private async Task WaitForSpace()
         {
             while (true)
@@ -341,27 +355,6 @@ namespace SequenceClicker
                 }
                 await Task.Delay(10);
             }
-        }
-
-        private void OK_Click(object sender, RoutedEventArgs e)
-        {
-            if (task is ClickTask click)
-            {
-                click.Repeats = int.Parse(TB_Click.Text.Trim());
-                click.Leftclick = Tog_Click.IsChecked == true ? false : true;
-            }
-
-            if (task is DelayTask delay)
-            {
-                delay.Delay = double.Parse(tb_dmin.Text.Trim()) * 60 + double.Parse(tb_dsec.Text.Trim());
-            }
-
-            if (task is MoveTask move)
-            {
-                move.XPos = int.Parse(TB_X.Text.Trim());
-                move.YPos = int.Parse(TB_Y.Text.Trim());
-            }
-            EditingWindow.Close();
         }
     }
 }

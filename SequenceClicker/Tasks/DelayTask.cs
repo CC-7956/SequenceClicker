@@ -1,11 +1,11 @@
 ﻿using System.Text;
 
-namespace SequenceClicker
+namespace SequenceClicker.Tasks
 {
     public class DelayTask : MyTask
     {
-        double _delay;
-        public double Delay
+        int _delay;
+        public int Delay
         {
             get => _delay;
             set
@@ -19,7 +19,7 @@ namespace SequenceClicker
             }
         }
 
-        public DelayTask(double delay)
+        public DelayTask(int delay)
         {
             Delay = delay;
         }
@@ -37,13 +37,21 @@ namespace SequenceClicker
             saveTxt = saveTxt.Remove(0, 5);
             saveTxt = saveTxt.Replace("[", "");
             saveTxt = saveTxt.Replace("]", "");
-            return new DelayTask(double.Parse(saveTxt.Split(":")[1]));
+            return new DelayTask(int.Parse(saveTxt.Split(":")[1]));
+        }
+
+        public static bool ValidInput(string min, string sec)
+        {
+            if ((double.TryParse(min.Trim(), out double d) && d > 0) || (double.TryParse(sec.Trim(), out double q) && q > 0))
+            {
+                return true;
+            }
+            return false;
         }
 
         public override string ToString()
         {
-            int totalMilliseconds = (int)Math.Round(Delay * 1000);
-            TimeSpan ts = TimeSpan.FromMilliseconds(totalMilliseconds);
+            TimeSpan ts = TimeSpan.FromMilliseconds(_delay);
             var parts = new List<string>();
             parts.Add("Delay ");
             if (ts.Hours > 0)

@@ -1,19 +1,20 @@
 ﻿using System.Text;
+using System.Windows.Controls;
 
-namespace SequenceClicker
+namespace SequenceClicker.Tasks
 {
     public class ClickTask : MyTask
     {
-        bool _leftclick;
-        public bool Leftclick
+        bool _isLeftclick;
+        public bool IsLeftclick
         {
-            get => _leftclick;
+            get => _isLeftclick;
             set
             {
-                if (_leftclick != value)
+                if (_isLeftclick != value)
                 {
-                    _leftclick = value;
-                    OnPropertyChanged(nameof(_leftclick));
+                    _isLeftclick = value;
+                    OnPropertyChanged(nameof(_isLeftclick));
                     OnPropertyChanged(nameof(DisplayText));
                 }
             }
@@ -32,9 +33,8 @@ namespace SequenceClicker
                 }
             }
         }
-
-        double _delay;
-        public double _Delay
+        int _delay;
+        public int Delay
         {
             get => _delay;
             set
@@ -48,26 +48,30 @@ namespace SequenceClicker
             }
         }
 
-        public ClickTask(bool leftclick, int repeats)
+        /// <summary>
+        /// Default Constructor for a Click Task
+        /// </summary>
+        /// <param name="leftclick">Boolean if it is a Leftclick</param>
+        public ClickTask(bool leftclick)
         {
-            Leftclick = leftclick;
-            Repeats = repeats;
+            IsLeftclick = leftclick;
+            Repeats = 1;
         }
 
-        public ClickTask(bool leftclick, int repeats, double delay)
+        public ClickTask(bool leftclick, int repeats, int delay)
         {
-            Leftclick = leftclick;
+            IsLeftclick = leftclick;
             Repeats = repeats;
-            _Delay = delay;
+            Delay = delay;
         }
 
         public override string GetSave()
         {
             StringBuilder sb = new StringBuilder("Click[");
-            sb.Append($"Leftclick:{_leftclick};");
-            sb.Append($"Repeats:{_repeats}");
+            sb.Append($"Leftclick:{_isLeftclick}");
             if (_delay > 0)
             {
+                sb.Append($";Repeats:{_repeats}");
                 sb.Append($";Delay:{_delay}");
             }
             sb.Append("]\n");
@@ -79,18 +83,27 @@ namespace SequenceClicker
             saveTxt = saveTxt.Remove(0, 5);
             saveTxt = saveTxt.Replace("[", "");
             saveTxt = saveTxt.Replace("]", "");
-            string[] values = saveTxt.Split(";");
-            if (values.Length == 3)
+
+            if (saveTxt.Contains(";"))
             {
-                return new ClickTask(values[0].Split(":")[1].ToLower() == "true" ? true : false, int.Parse(values[1].Split(":")[1]), double.Parse(values[2].Split(":")[1]));
+                string[] values = saveTxt.Split(";");
+                return new ClickTask(values[0].Split(":")[1].ToLower() == "true" ? true : false, int.Parse(values[1].Split(":")[1]), int.Parse(values[2].Split(":")[1]));
             }
-            return new ClickTask(values[0].Split(":")[1].ToLower() == "true" ? true : false, int.Parse(values[1].Split(":")[1]));
+            return new ClickTask(saveTxt.Split(":")[1].ToLower() == "true" ? true : false);
+        }
+        public static bool ValidInput(string repeats, bool delay)
+        {
+            if (uint.TryParse(repeats.Trim(), out uint rep) && rep > 1 && !delay)
+            {
+                return false;
+            }
+            return true;
         }
 
         public override string ToString()
         {
             string s = "";
-            if (Leftclick)
+            if (IsLeftclick)
             {
                 s += $"Leftclick {Repeats}x";
             }
@@ -100,7 +113,7 @@ namespace SequenceClicker
             }
             if (Repeats > 1)
             {
-                s += $" w. {_Delay}s delay";
+                s += $" w. {Delay}s delay";
             }
             return s;
         }

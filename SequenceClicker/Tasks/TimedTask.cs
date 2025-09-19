@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SequenceClicker
+namespace SequenceClicker.Tasks
 {
     internal class TimedTask : MyTask
     {
@@ -23,21 +23,21 @@ namespace SequenceClicker
         }
 
         ObservableCollection<MyTask> _subSeq;
-        public ObservableCollection<MyTask> SubSeq 
-        { 
+        public ObservableCollection<MyTask> SubSeq
+        {
             get { return _subSeq; }
             set
             {
                 _subSeq = value;
             }
         }
-        bool _start;
+        private bool _IsStart;
 
         public TimedTask(double time, bool start)
         {
             Time = time;
             SubSeq = new ObservableCollection<MyTask>();
-            _start = start;
+            _IsStart = start;
         }
 
 
@@ -55,7 +55,7 @@ namespace SequenceClicker
             TimeSpan ts = TimeSpan.FromMilliseconds(totalMilliseconds);
             var parts = new List<string>();
             parts.Add("Timed");
-            if (_start)
+            if (_IsStart)
             {
                 parts.Add("start");
                 if (ts.Hours > 0)

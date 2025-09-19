@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SequenceClicker
+namespace SequenceClicker.Tasks
 {
     public class MoveTask : MyTask
     {
@@ -57,6 +57,14 @@ namespace SequenceClicker
             return new MoveTask(int.Parse(values[0].Split(":")[1]), int.Parse(values[1].Split(":")[1]));
         }
 
+        public static bool ValidInput(string x, string y)
+        {
+            if (int.TryParse(x.Trim(), out int ix) && int.TryParse(y.Trim(), out int iy))
+            {
+                return true;
+            }
+            return false;
+        }
         public override string ToString()
         {
             return $"Move to {XPos}|{YPos}";

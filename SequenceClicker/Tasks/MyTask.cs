@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace SequenceClicker
+namespace SequenceClicker.Tasks
 {
     public abstract class MyTask : INotifyPropertyChanged
     {
@@ -13,7 +13,7 @@ namespace SequenceClicker
         public abstract string GetSave();
         public static MyTask LoadSave(string savedText)
         {
-            string type = savedText.Split('[')[0]; 
+            string type = savedText.Split('[')[0];
             switch (type)
             {
                 case "Click": return ClickTask.LoadSave(savedText);
