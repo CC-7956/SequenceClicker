@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         x:Name="EditingWindow"
         Topmost="True"
-        Title="Edit" Height="190" Width="195">
+        ResizeMode="CanMinimize"
+        Title="Edit" Height="360" Width="390">
     <Viewbox>
         <Grid Height="170" Width="195">
             <Label x:Name="lb_EditClick" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Click" FontSize="15"/>

@@ -114,6 +114,7 @@ namespace SequenceClicker
         #region Functionallity
         private async Task RunTasks(List<MyTask> currendSeq, CancellationToken token, int repeats)
         {
+            AutoClicker.Topmost = true;
             Status.Text = "Autoclicker started...";
             for (int i = 0; i != repeats; i++)
             {
@@ -159,8 +160,9 @@ namespace SequenceClicker
             }
             _isRunning = false;
             Status.Text = "Autoclicker stoped.";
+            AutoClicker.Topmost = false;
         }
-        private async Task DoClick(INPUT[] inputs, int repeats, double delay, CancellationToken token)
+        private async Task DoClick(INPUT[] inputs, int repeats, int delay, CancellationToken token)
         {
             for (int i = 0; i < repeats; i++)
             {
@@ -169,10 +171,9 @@ namespace SequenceClicker
             }
             await Task.Delay(0, token);
         }
-        private async Task DoDelay(double delay, CancellationToken token)
+        private async Task DoDelay(int delay, CancellationToken token)
         {
-            int calculatedDelay = (int)(1000 * delay);
-            await Task.Delay(calculatedDelay, token);
+            await Task.Delay(delay, token);
         }
         private async Task DoMove(int x, int y, CancellationToken token)
         {
@@ -184,6 +185,8 @@ namespace SequenceClicker
             _cts?.Cancel();
             _isRunning = false;
             Status.Text = "Autoclicker was canceled.";
+            AutoClicker.Topmost = false;
+
         }
         #endregion
 
