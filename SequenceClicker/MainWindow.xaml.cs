@@ -99,13 +99,16 @@ namespace SequenceClicker
         #endregion
 
         private Point _dragStartPoint;
+        private MyTask _draggedItem;
         private AdornerLayer _adornerLayer;
         private DropInsertionAdorner _dropAdorner;
+        private (ListViewItem container, bool isAbove, int index) _currentDropTarget = (null, false, -1);
 
         public MainWindow()
         {
             InitializeComponent();
             LB_Seq.ItemsSource = _sequence;
+            LB_Seq.PreviewDragLeave += LB_Seq_PreviewDragLeave;
         }
 
         #region Functionallity
@@ -673,103 +676,6 @@ namespace SequenceClicker
                 btn_Delete.IsEnabled = false;
             }
         }
-
-        private void LB_Seq_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _dragStartPoint = e.GetPosition(null);
-        }
-
-        private void LB_Seq_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Point position = e.GetPosition(null);
-                if (System.Math.Abs(position.X - _dragStartPoint.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                    System.Math.Abs(position.Y - _dragStartPoint.Y) > SystemParameters.MinimumVerticalDragDistance)
-                {
-                    if (sender is ListView listView && listView.SelectedItem != null)
-                    {
-                        DragDrop.DoDragDrop(listView, listView.SelectedItem, DragDropEffects.Move);
-                    }
-                }
-            }
-        }
-
-        private void LB_Seq_Drop(object sender, DragEventArgs e)
-        {
-            RemoveDropAdorner();
-
-            if (e.Data.GetDataPresent(typeof(MyTask)))
-            {
-                var droppedData = e.Data.GetData(typeof(MyTask)) as MyTask;
-                var listView = sender as ListView;
-                Point position = e.GetPosition(listView);
-                var targetItem = GetItemAt(listView, position);
-
-                if (targetItem == null || droppedData == targetItem)
-                    return;
-
-                int oldIndex = _sequence.IndexOf(droppedData);
-                int newIndex = _sequence.IndexOf(targetItem);
-
-                // Decide if above or below
-                var container = listView.ItemContainerGenerator.ContainerFromItem(targetItem) as ListViewItem;
-                if (container != null)
-                {
-                    Point itemPos = e.GetPosition(container);
-                    if (itemPos.Y > container.ActualHeight / 2)
-                        newIndex++;
-                }
-
-                if (oldIndex != newIndex)
-                {
-                    if (newIndex >= _sequence.Count) newIndex = _sequence.Count - 1;
-                    _sequence.Move(oldIndex, newIndex);
-
-                    _saved = false;
-                    Update();
-                }
-            }
-        }
-        private MyTask GetItemAt(ListView listView, Point position)
-        {
-            var element = listView.InputHitTest(position) as FrameworkElement;
-            return element?.DataContext as MyTask;
-        }
-
-        private void LB_Seq_DragOver(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(typeof(MyTask)))
-            {
-                var listView = sender as ListView;
-                Point position = e.GetPosition(listView);
-                var targetItem = GetItemAt(listView, position);
-
-                RemoveDropAdorner();
-
-                if (targetItem != null)
-                {
-                    var container = listView.ItemContainerGenerator.ContainerFromItem(targetItem) as ListViewItem;
-                    if (container != null)
-                    {
-                        Point itemPos = e.GetPosition(container);
-                        bool isAbove = itemPos.Y < container.ActualHeight / 2;
-
-                        _adornerLayer = AdornerLayer.GetAdornerLayer(container);
-                        _dropAdorner = new DropInsertionAdorner(container, isAbove);
-                        _adornerLayer.Add(_dropAdorner);
-                    }
-                }
-            }
-        }
-        private void RemoveDropAdorner()
-        {
-            if (_dropAdorner != null && _adornerLayer != null)
-            {
-                _adornerLayer.Remove(_dropAdorner);
-                _dropAdorner = null;
-            }
-        }
         private void LB_Seq_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (LB_Seq.SelectedItem != null && !_editRunning)
@@ -790,6 +696,235 @@ namespace SequenceClicker
             else
             {
                 _editWindow.Focus();
+            }
+        }
+        // --- PREVIEW MOUSE DOWN (record start and dragged item) ---
+        private void LB_Seq_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _dragStartPoint = e.GetPosition(null);
+            _draggedItem = null;
+
+            // find item under mouse
+            var element = e.OriginalSource as DependencyObject;
+            var container = ItemsControl.ContainerFromElement(LB_Seq, element) as ListViewItem;
+            if (container != null)
+            {
+                _draggedItem = container.DataContext as MyTask;
+            }
+        }
+
+        // --- MOUSE MOVE (start drag) ---
+        private void LB_Seq_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed || _draggedItem == null)
+                return;
+
+            var currentPos = e.GetPosition(null);
+            Vector diff = currentPos - _dragStartPoint;
+            if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance &&
+                Math.Abs(diff.Y) < SystemParameters.MinimumVerticalDragDistance)
+                return;
+
+            // Pack the drag data using the base type so derived types match
+            var data = new DataObject(typeof(MyTask), _draggedItem);
+
+            // Make sure we can remove any leftover adorner
+            RemoveDropAdorner();
+
+            // Start drag - DoDragDrop blocks until drop completes
+            DragDrop.DoDragDrop(LB_Seq, data, DragDropEffects.Move);
+
+            // Clear dragged item and adorner after drag ends
+            _draggedItem = null;
+            RemoveDropAdorner();
+        }
+
+        // --- DRAG OVER (update adorner + effect) ---
+        private void LB_Seq_DragOver(object sender, DragEventArgs e)
+        {
+            // only accept MyTask (or derived)
+            if (!e.Data.GetDataPresent(typeof(MyTask)))
+            {
+                e.Effects = DragDropEffects.None;
+                e.Handled = true;
+                RemoveDropAdorner();
+                return;
+            }
+
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+
+            // find the item under the mouse (may be null)
+            var element = e.OriginalSource as DependencyObject;
+            var container = ItemsControl.ContainerFromElement(LB_Seq, element) as ListViewItem;
+
+            bool isAbove = true;
+            int index = -1;
+            UIElement adornerTarget = null; // can be a ListViewItem or the ListView itself
+
+            if (container != null)
+            {
+                // hovering over an item
+                index = LB_Seq.ItemContainerGenerator.IndexFromContainer(container);
+                Point posInItem = e.GetPosition(container);
+                isAbove = posInItem.Y < container.ActualHeight / 2;
+                adornerTarget = container;
+            }
+            else
+            {
+                // not over an item -> either end-of-list or empty list
+                if (_sequence.Count > 0)
+                {
+                    // attach under last item (drop to end)
+                    var lastContainer = LB_Seq.ItemContainerGenerator.ContainerFromIndex(_sequence.Count - 1) as ListViewItem;
+                    if (lastContainer != null)
+                    {
+                        container = lastContainer; // keep null-check semantics for currentDropTarget.container
+                        isAbove = false; // below last item
+                        index = _sequence.Count;
+                        adornerTarget = lastContainer;
+                    }
+                    else
+                    {
+                        // fall back to attaching to ListView
+                        index = _sequence.Count;
+                        adornerTarget = LB_Seq;
+                        container = null;
+                        isAbove = false;
+                    }
+                }
+                else
+                {
+                    // empty list -> draw at top of ListView
+                    index = 0;
+                    adornerTarget = LB_Seq;
+                    container = null;
+                    isAbove = true;
+                }
+            }
+
+            // Only update adorner if target changed
+            if (_currentDropTarget.container != container || _currentDropTarget.isAbove != isAbove)
+            {
+                RemoveDropAdorner();
+
+                if (adornerTarget != null)
+                {
+                    _adornerLayer = AdornerLayer.GetAdornerLayer(adornerTarget);
+                    if (_adornerLayer != null)
+                    {
+                        _dropAdorner = new DropInsertionAdorner(adornerTarget, isAbove);
+                        _adornerLayer.Add(_dropAdorner);
+                    }
+                }
+
+                _currentDropTarget = (container, isAbove, index);
+            }
+        }
+
+
+        // --- DROP (perform re-order) ---
+        private void LB_Seq_Drop(object sender, DragEventArgs e)
+        {
+            RemoveDropAdorner();
+
+            if (!e.Data.GetDataPresent(typeof(MyTask)))
+                return;
+
+            var droppedData = e.Data.GetData(typeof(MyTask)) as MyTask;
+            if (droppedData == null)
+                return;
+
+            // Calculate intended insertion index (using the last known _currentDropTarget if available)
+            int targetIndex;
+            if (_currentDropTarget.container == null)
+            {
+                // fallback: compute from mouse position
+                var pt = e.GetPosition(LB_Seq);
+                var maybeContainer = ItemsControl.ContainerFromElement(LB_Seq, LB_Seq.InputHitTest(pt) as DependencyObject) as ListViewItem;
+                if (maybeContainer == null)
+                    targetIndex = _sequence.Count;
+                else
+                {
+                    int idx = LB_Seq.ItemContainerGenerator.IndexFromContainer(maybeContainer);
+                    var pIn = e.GetPosition(maybeContainer);
+                    targetIndex = pIn.Y < maybeContainer.ActualHeight / 2 ? idx : idx + 1;
+                }
+            }
+            else
+            {
+                // use previously computed index and above/below
+                targetIndex = _currentDropTarget.index;
+                if (!_currentDropTarget.isAbove)
+                    targetIndex = Math.Min(_sequence.Count, targetIndex + 1);
+            }
+
+            int oldIndex = _sequence.IndexOf(droppedData);
+            if (oldIndex == -1)
+                return;
+
+            // If inserting after the item and the old index is before the target, the final index shifts left by 1
+            if (targetIndex > oldIndex) targetIndex--;
+
+            // If targetIndex equals Count -> move to end by remove+add, else use Move
+            if (targetIndex < 0) targetIndex = 0;
+            if (targetIndex >= _sequence.Count)
+            {
+                _sequence.RemoveAt(oldIndex);
+                _sequence.Add(droppedData);
+            }
+            else
+            {
+                if (oldIndex != targetIndex)
+                    _sequence.Move(oldIndex, targetIndex);
+            }
+
+            // Select moved item
+            LB_Seq.SelectedItem = droppedData;
+
+            // mark unsaved and update UI if needed
+            _saved = false;
+            Update();
+        }
+
+        // --- DRAG LEAVE (clean up) ---
+        private void LB_Seq_PreviewDragLeave(object sender, DragEventArgs e)
+        {
+            RemoveDropAdorner();
+        }
+
+        // --- REMOVE ADORNER helper ---
+        private void RemoveDropAdorner()
+        {
+            if (_dropAdorner != null && _adornerLayer != null)
+            {
+                _adornerLayer.Remove(_dropAdorner);
+                _dropAdorner = null;
+            }
+            _currentDropTarget = (null, false, -1);
+        }
+
+        // --- ADORNER CLASS (draws the red insertion line) ---
+        public class DropInsertionAdorner : Adorner
+        {
+            private readonly bool _isAbove;
+            private readonly UIElement _adornedElement;
+
+            public DropInsertionAdorner(UIElement adornedElement, bool isAbove)
+                : base(adornedElement)
+            {
+                _adornedElement = adornedElement;
+                _isAbove = isAbove;
+                IsHitTestVisible = false;
+            }
+
+            protected override void OnRender(DrawingContext drawingContext)
+            {
+                var rect = new Rect(_adornedElement.RenderSize);
+                double y = _isAbove ? 0 : rect.Bottom;
+                var pen = new Pen(Brushes.Red, 2);
+                pen.Freeze();
+                drawingContext.DrawLine(pen, new Point(0, y), new Point(rect.Right, y));
             }
         }
         #endregion

@@ -148,8 +148,11 @@ namespace SequenceClicker
                 lb_dsec.Margin = new Thickness(100, 71, 0, 0);
                 tb_dmin.IsEnabled = true;
                 tb_dsec.IsEnabled = true;
-                int min = (int)(task.Delay / 60);
-                int sec = (int)(task.Delay % 60);
+                double time = (double)task.Delay / 1000d;
+                double min = 0;
+                if (time > 60)
+                    min = (time / 60d);
+                double sec = (time % 60d);
                 tb_dmin.Text = min.ToString();
                 tb_dsec.Text = sec.ToString();
             }
@@ -164,8 +167,11 @@ namespace SequenceClicker
 
             tb_dmin.IsEnabled = true;
             tb_dsec.IsEnabled = true;
-            int min = (int)(task.Delay / 60);
-            int sec = (int)(task.Delay % 60);
+            double time = (double)task.Delay / 1000d;
+            double min = 0;
+            if (time > 60)
+                min = (time / 60d);
+            double sec = (time % 60d);
             tb_dmin.Text = min.ToString();
             tb_dsec.Text = sec.ToString();
         }

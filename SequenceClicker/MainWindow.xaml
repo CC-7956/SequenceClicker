@@ -41,14 +41,22 @@
             <TextBox x:Name="TB_Repeats" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,161,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
             <ToggleButton x:Name="Tog_Inf" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,161,0,0" Height="22" Width="22" Focusable="False" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
 
-            <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,90" Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,90" Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10"/>
 
             <Button x:Name="btn_Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,20" Width="50" Focusable="False" IsEnabled="False" Content="Delete" FontSize="15" Click="btn_Delete_Click"/>
             <Button x:Name="btn_Reset" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,50" Width="50" Focusable="False" Content="Reset" FontSize="15" Click="btn_Reset_Click"/>
             <Button x:Name="btn_Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,110" Width="50" Focusable="False" IsEnabled="False" Content="Save" FontSize="15" Click="btn_Save_Click"/>
             <Button x:Name="btn_Load" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,80" Width="50" Focusable="False" Content="Load" FontSize="15" Click="btn_Load_Click"/>
             <TextBlock x:Name="Status" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Height="75" Width="200" Focusable="False" TextWrapping="Wrap" Text="Status" FontSize="10"/>
-            <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" Height="380" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" ItemsSource="{Binding sequence}" AllowDrop="True" SelectionChanged="LB_Seq_SelectionChanged" PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" MouseMove="LB_Seq_MouseMove" Drop="LB_Seq_Drop" DragOver="LB_Seq_DragOver" MouseDoubleClick="LB_Seq_MouseDoubleClick">
+            <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" Height="380" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" 
+                      ItemsSource="{Binding sequence}"
+                      AllowDrop="True"
+                      SelectionChanged="LB_Seq_SelectionChanged" 
+                      PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" 
+                      MouseMove="LB_Seq_MouseMove" 
+                      DragOver="LB_Seq_DragOver"
+                      Drop="LB_Seq_Drop"
+                      MouseDoubleClick="LB_Seq_MouseDoubleClick">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding DisplayText}" />
