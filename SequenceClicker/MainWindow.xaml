@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SequenceClicker"
         mc:Ignorable="d"
         x:Name="AutoClicker"
-        Topmost="True"
+        ResizeMode="CanMinimize"
         Title="Super Cooler Sequenzen Clicker" Height="420" Width="450">
     <Viewbox>
         <Grid Height="400" Width="450">
