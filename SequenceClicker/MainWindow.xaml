@@ -1,0 +1,60 @@
+﻿<Window x:Class="SequenceClicker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SequenceClicker"
+        mc:Ignorable="d"
+        x:Name="AutoClicker"
+        Topmost="True"
+        Title="Super Cooler Sequenzen Clicker" Height="420" Width="450">
+    <Viewbox>
+        <Grid Height="400" Width="450">
+            <Button x:Name="btn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Click" FontSize="15" Click="btn_AddClick"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,7,0,0" Focusable="False" ToolTip="If >1 enter a number in Delay Box" Content="Click repeats:" FontSize="15"/>
+            <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,11,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
+            <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,11,0,0" Height="22" Width="22" Focusable="False" ToolTip="Rightclick?" Click="Tog_Clicked"/>
+
+            <Button x:Name="btn_Delay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Delay" FontSize="15" Click="btn_AddDelay"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,37,0,0" Focusable="False" Content="Min:" FontSize="15"/>
+            <TextBox x:Name="tb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,37,0,0" Focusable="False" Content="Sec:" FontSize="15"/>
+            <TextBox x:Name="tb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+
+            <Button x:Name="btn_Move" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Move" FontSize="15" Click="btn_AddMove"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,67,0,0" Focusable="False" Content="X:" FontSize="15"/>
+            <TextBox x:Name="TB_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,71,0,0" Width="50" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,67,0,0" Focusable="False" Content="Y:" FontSize="15"/>
+            <TextBox x:Name="TB_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,71,0,0" Width="50" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
+
+            <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,100,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
+            <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="140,100,0,0" Width="50" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
+
+            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Time" FontSize="15" Click="btn_Timed_Click"/> <!--WIP-->
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,127,0,0" Focusable="False" Content="Min:" FontSize="15" /> <!--WIP-->
+            <TextBox x:Name="tb_min" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" Content="Sec:" FontSize="15" /> <!--WIP-->
+            <TextBox x:Name="tb_sec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
+
+            <Button x:Name="btn_Start" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,160,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Start" FontSize="15" Click="btn_Start_Click"/>
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,157,0,0" Focusable="False" Content="Total repeats:" FontSize="15"/>
+            <TextBox x:Name="TB_Repeats" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,161,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
+            <ToggleButton x:Name="Tog_Inf" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,161,0,0" Height="22" Width="22" Focusable="False" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
+
+            <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,90" Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10"/>
+
+            <Button x:Name="btn_Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,20" Width="50" Focusable="False" IsEnabled="False" Content="Delete" FontSize="15" Click="btn_Delete_Click"/>
+            <Button x:Name="btn_Reset" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,50" Width="50" Focusable="False" Content="Reset" FontSize="15" Click="btn_Reset_Click"/>
+            <Button x:Name="btn_Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,110" Width="50" Focusable="False" IsEnabled="False" Content="Save" FontSize="15" Click="btn_Save_Click"/>
+            <Button x:Name="btn_Load" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,80" Width="50" Focusable="False" Content="Load" FontSize="15" Click="btn_Load_Click"/>
+            <TextBlock x:Name="Status" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Height="75" Width="200" Focusable="False" TextWrapping="Wrap" Text="Status" FontSize="10"/>
+            <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" Height="380" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" ItemsSource="{Binding sequence}" AllowDrop="True" SelectionChanged="LB_Seq_SelectionChanged" PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" MouseMove="LB_Seq_MouseMove" Drop="LB_Seq_Drop" DragOver="LB_Seq_DragOver" MouseDoubleClick="LB_Seq_MouseDoubleClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DisplayText}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </Viewbox>
+</Window>
