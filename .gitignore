@@ -1,0 +1,20 @@
+# Ignore build output
+**/bin/
+**/obj/
+
+# Visual Studio files
+*.user
+*.suo
+*.vscode/
+.vs/
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
