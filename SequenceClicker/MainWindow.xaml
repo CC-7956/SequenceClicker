@@ -10,7 +10,7 @@
         Title="Super Cooler Sequenzen Clicker" Height="420" Width="450">
     <Viewbox>
         <Grid Height="400" Width="450">
-            <Button x:Name="btn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Click" FontSize="15" Click="btn_AddClick"/>
+            <Button x:Name="btn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="50" Focusable="False" Content="Click" FontSize="15" Click="btn_AddClick"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,7,0,0" Focusable="False" ToolTip="If >1 enter a number in Delay Box" Content="Click repeats:" FontSize="15"/>
             <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,11,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
             <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,11,0,0" Height="22" Width="22" Focusable="False" ToolTip="Rightclick?" Click="Tog_Clicked"/>
@@ -30,7 +30,7 @@
             <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,100,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
             <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="140,100,0,0" Width="50" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
 
-            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Time" FontSize="15" Click="btn_Timed_Click"/> <!--WIP-->
+            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Time" FontSize="15" Click="btn_AddTimed"/> <!--WIP-->
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,127,0,0" Focusable="False" Content="Min:" FontSize="15" /> <!--WIP-->
             <TextBox x:Name="tb_min" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" Content="Sec:" FontSize="15" /> <!--WIP-->

@@ -29,6 +29,12 @@
             <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
             <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
 
+            <Label x:Name="lb_TimedDelay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Timrd" FontSize="15"/>
+            <Label x:Name="lb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" Content="Min:" FontSize="15"/>
+            <TextBox x:Name="tb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label x:Name="lb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,37,0,0" Focusable="False" Content="Sec:" FontSize="15"/>
+            <TextBox x:Name="tb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+
             <Button x:Name="OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="30" Focusable="False" IsEnabled="False" Content="OK" FontSize="15" Click="OK_Click"/>
         </Grid>
     </Viewbox>

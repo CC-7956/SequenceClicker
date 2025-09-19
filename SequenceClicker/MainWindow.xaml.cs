@@ -1,9 +1,9 @@
 ﻿using Microsoft.Win32;
+using SequenceClicker.Tasks;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -18,14 +18,24 @@ namespace SequenceClicker
     /// </summary>
     public partial class MainWindow : Window
     {
-        #region key detector
-        // Import WinAPI functions
+        #region DLL imports
+        #region HotKey
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        #endregion
+        #region Cursor
+        [DllImport("user32.dll")]
+        static extern bool SetCursorPos(int X, int Y);
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+        [DllImport("user32.dll")]
+        static extern bool GetCursorPos(out POINT lpPoint);
+        #endregion
+        #endregion
 
+        #region HotKey Variables
         // Modifier keys
         private const uint MOD_NONE = 0x0000;  // No modifier
         private const uint MOD_ALT = 0x0001;
@@ -36,8 +46,6 @@ namespace SequenceClicker
         private const int F6STRGID = 9000; // any unique ID
         private const int F7STRGID = 9001; // any unique ID
         private const int F7ALTID = 9002; // any unique ID
-        #endregion
-        #region ClickVars
         // --- Structures for SendInput ---
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
@@ -56,32 +64,9 @@ namespace SequenceClicker
             public uint time;
             public IntPtr dwExtraInfo;
         }
+        #endregion
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct RECT
-        {
-            public int Left, Top, Right, Bottom;
-        }
-
-        // --- DLL Imports ---
-        [DllImport("user32.dll")]
-        static extern bool SetCursorPos(int X, int Y);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
-        [DllImport("user32.dll")]
-        static extern int GetSystemMetrics(int nIndex);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
+        #region Cursor Variables
         // --- Constants ---
         const uint INPUT_MOUSE = 0;
         // Left button
@@ -91,13 +76,6 @@ namespace SequenceClicker
         const uint MOUSEEVENTF_RIGHTDOWN = 0x08;
         const uint MOUSEEVENTF_RIGHTUP = 0x10;
 
-        const int SM_XVIRTUALSCREEN = 76; // left coordinate
-        const int SM_YVIRTUALSCREEN = 77; // top coordinate
-        #endregion
-        #region CursorPos
-        [DllImport("user32.dll")]
-        static extern bool GetCursorPos(out POINT lpPoint);
-
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
@@ -106,40 +84,31 @@ namespace SequenceClicker
         }
         #endregion
 
-        bool Saved = false;
-        bool Timed = false;
-        int period = 0;
-        ObservableCollection<MyTask> _SavedSequence = new ObservableCollection<MyTask>();
-        ObservableCollection<MyTask> sequence = new ObservableCollection<MyTask>();
+        #region Functionallity Variables
+        private bool _isRunning = false;
+        private bool _editRunning = false;
+        private bool _saved = false;
+        private bool _timed = false;
+
         private CancellationTokenSource _cts;
-        bool IsRunning = false;
+
+        private ObservableCollection<MyTask> _savedSequence = new ObservableCollection<MyTask>();
+        private ObservableCollection<MyTask> _sequence = new ObservableCollection<MyTask>();
+
+        private Window _editWindow;
+        #endregion
+
+        private Point _dragStartPoint;
+        private AdornerLayer _adornerLayer;
+        private DropInsertionAdorner _dropAdorner;
+
         public MainWindow()
         {
             InitializeComponent();
-            LB_Seq.ItemsSource = sequence;
+            LB_Seq.ItemsSource = _sequence;
         }
 
-        private void Update(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Update();
-        }
-
-        private void Update()
-        {
-            if (sequence.Count >= 1 && !Saved)
-            {
-                btn_Save.IsEnabled = true;
-            }
-            else
-            {
-                btn_Save.IsEnabled = false;
-            }
-            Check_Move();
-            Check_Delay();
-            Check_Click();
-            Check_Repeat();
-        }
-
+        #region Functionallity
         private async Task RunTasks(List<MyTask> currendSeq, CancellationToken token, int repeats)
         {
             Status.Text = "Autoclicker started...";
@@ -154,7 +123,7 @@ namespace SequenceClicker
                     if (task is ClickTask click)
                     {
                         INPUT[] Input = new INPUT[2];
-                        if (click.Leftclick)
+                        if (click.IsLeftclick)
                         {
                             Input[0].type = INPUT_MOUSE;
                             Input[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -170,7 +139,7 @@ namespace SequenceClicker
                             Input[1].type = INPUT_MOUSE;
                             Input[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
                         }
-                        await DoClick(Input, click.Repeats, click._Delay, token);
+                        await DoClick(Input, click.Repeats, click.Delay, token);
                     }
                     if (task is DelayTask delay)
                     {
@@ -185,7 +154,7 @@ namespace SequenceClicker
                 if (token.IsCancellationRequested)
                     break;
             }
-            IsRunning = false;
+            _isRunning = false;
             Status.Text = "Autoclicker stoped.";
         }
         private async Task DoClick(INPUT[] inputs, int repeats, double delay, CancellationToken token)
@@ -207,19 +176,127 @@ namespace SequenceClicker
             SetCursorPos(x, y);
             await Task.Delay(0, token);
         }
+        public void StopClickTask()
+        {
+            _cts?.Cancel();
+            _isRunning = false;
+            Status.Text = "Autoclicker was canceled.";
+        }
+        #endregion
 
+        #region Buttons
+
+        #region Add
         private void btn_AddClick(object sender, RoutedEventArgs e)
         {
             ClickTask t;
             bool left = Tog_Click.IsChecked == true ? false : true;
-            int repeats = int.Parse(TB_Click.Text.Trim());
-            double delay = -1;
-            if (repeats > 1)
+            int delay = -1;
+
+            if (int.TryParse(TB_Click.Text.Trim(), out int rep) && rep > 1)
             {
-                double min;
+                double min = -1;
                 try
                 {
                     min = double.Parse(tb_dmin.Text.Trim());
+                }
+                catch (FormatException)
+                {
+                    min = 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Screenshot this error\n" + ex.Message, "Error while adding Click Task", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                double sec = -1;
+                try
+                {
+                    sec = double.Parse(tb_dsec.Text.Trim());
+                }
+                catch (FormatException)
+                {
+                    sec = 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Screenshot this error\n" + ex.Message, "Error while adding Click Task", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                delay = (int)((min * 60 + sec) * 1000);
+                t = new ClickTask(left, rep, delay);
+            }
+            else
+            {
+                t = new ClickTask(left);
+            }
+            _sequence.Add(t);
+            Status.Text = $"{t} was added";
+            Update();
+            _saved = false;
+        }
+        private void btn_AddDelay(object sender, RoutedEventArgs e)
+        {
+            double min = -1;
+            try
+            {
+                min = double.Parse(tb_dmin.Text.Trim());
+            }
+            catch (FormatException)
+            {
+                min = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Screenshot this error\n" + ex.Message, "Error while adding Click Task", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            double sec = -1;
+            try
+            {
+                sec = double.Parse(tb_dsec.Text.Trim());
+            }
+            catch (FormatException)
+            {
+                sec = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Screenshot this error\n" + ex.Message, "Error while adding Click Task", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            DelayTask t = new DelayTask((int)((min * 60d + sec) * 1000));
+            _sequence.Add(t);
+            Status.Text = $"{t} was added";
+            Update();
+            _saved = false;
+        }
+        private void btn_AddMove(object sender, RoutedEventArgs e)
+        {
+            MoveTask t = new MoveTask(int.Parse(TB_X.Text.Trim()), int.Parse(TB_Y.Text.Trim()));
+            _sequence.Add(t);
+            Status.Text = $"{t} was added";
+            Update();
+            _saved = false;
+        }
+        private void btn_AddTimed(object sender, RoutedEventArgs e)
+        {
+            if (_timed)
+            {
+                _timed = false;
+                btn_Timed.Background = new SolidColorBrush(Colors.LightGray);
+                tb_min.IsEnabled = true;
+                tb_sec.IsEnabled = true;
+            }
+            else
+            {
+                _timed = true;
+                btn_Timed.Background = new SolidColorBrush(Colors.Lime);
+                tb_min.IsEnabled = false;
+                tb_sec.IsEnabled = false;
+                double min;
+                try
+                {
+                    min = double.Parse(tb_min.Text.Trim());
                 }
                 catch
                 {
@@ -229,73 +306,27 @@ namespace SequenceClicker
                 double sec;
                 try
                 {
-                    sec = double.Parse(tb_dsec.Text.Trim());
+                    sec = double.Parse(tb_sec.Text.Trim());
                 }
                 catch
                 {
                     sec = 0;
                 }
-                delay = min * 60 + sec;
+                _sequence.Add(new TimedTask(min * 60 + sec, true));
             }
-
-            if (delay != -1)
-            {
-                t = new ClickTask(left, repeats, delay);
-            }
-            else
-            {
-                t = new ClickTask(left, repeats);
-            }
-
-            sequence.Add(t);
-            Status.Text = $"{t} was added";
-            Update();
-            Saved = false;
         }
-        private void btn_AddDelay(object sender, RoutedEventArgs e)
-        {
-            double min;
-            try
-            {
-                min = double.Parse(tb_dmin.Text.Trim());
-            }
-            catch
-            {
-                min = 0;
-            }
+        #endregion
 
-            double sec;
-            try
-            {
-                sec = double.Parse(tb_dsec.Text.Trim());
-            }
-            catch
-            {
-                sec = 0;
-            }
-            DelayTask t = new DelayTask(min * 60d + sec);
-            sequence.Add(t);
-            Status.Text = $"{t} was added";
-            Update();
-            Saved = false;
-        }
-        private void btn_AddMove(object sender, RoutedEventArgs e)
-        {
-            MoveTask t = new MoveTask(int.Parse(TB_X.Text.Trim()), int.Parse(TB_Y.Text.Trim()));
-            sequence.Add(t);
-            Status.Text = $"{t} was added";
-            Update();
-            Saved = false;
-        }
+        #region Funtionallity
         private void btn_Delete_Click(object sender, RoutedEventArgs e)
         {
-            if (sequence.Count > 0 && LB_Seq.SelectedItem != null)
+            if (_sequence.Count > 0 && LB_Seq.SelectedItem != null)
             {
                 MyTask t = LB_Seq.SelectedItem as MyTask;
-                sequence.Remove(t);
+                _sequence.Remove(t);
                 Status.Text = $"{t} was deleted";
                 Update();
-                Saved = false;
+                _saved = false;
             }
         }
         private void btn_Reset_Click(object sender, RoutedEventArgs e)
@@ -303,134 +334,149 @@ namespace SequenceClicker
             MessageBoxResult res = MessageBox.Show("Are you sure you want to reset the sequence", "Reset warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
             if (res == MessageBoxResult.Yes)
             {
-                sequence.Clear();
+                _sequence.Clear();
                 Status.Text = $"sequence was reset";
             }
             Update();
-            Saved = false;
+            _saved = false;
         }
         private void btn_Start_Click(object sender, RoutedEventArgs e)
         {
-            if (!IsRunning)
+            if (!_isRunning)
             {
-                IsRunning = true;
+                _isRunning = true;
                 _cts = new CancellationTokenSource();
-                _ = RunTasks(new List<MyTask>(sequence), _cts.Token, int.Parse(TB_Repeats.Text.Trim()));
+                _ = RunTasks(new List<MyTask>(_sequence), _cts.Token, int.Parse(TB_Repeats.Text.Trim()));
             }
         }
-
-        private static readonly Regex _regexDeci = new Regex("[^0-9,]+");
-        private void PosDeci(object sender, TextCompositionEventArgs e)
+        private void Tog_Inf_Checked(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            // Block invalid characters
-            if (_regexDeci.IsMatch(e.Text))
+            if (Tog_Inf.IsChecked == true)
             {
-                e.Handled = true;
-                return;
+                TB_Repeats.IsEnabled = false;
+                TB_Repeats.Text = "-1";
+                Tog_Inf.ToolTip = "Numbered repeats?";
             }
-
-            // Allow comma only once
-            if (e.Text == "," && textBox.Text.Contains(","))
+            else
             {
-                e.Handled = true;
+                TB_Repeats.IsEnabled = true;
+                Tog_Inf.ToolTip = "Infinite repeats?";
+            }
+            Update();
+        }
+        private void btn_Test_Click(object sender, RoutedEventArgs e)
+        {
+            SetCursorPos(int.Parse(TB_X.Text), int.Parse(TB_Y.Text));
+        }
+        private async void btn_Auto_Click(object sender, RoutedEventArgs e)
+        {
+            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\".";
+            btn_Auto.Background = new SolidColorBrush(Colors.Lime);
+            Keyboard.ClearFocus();
+            await WaitForSpace();
+            POINT p;
+            GetCursorPos(out p);
+            TB_X.Text = p.X.ToString();
+            TB_Y.Text = p.Y.ToString();
+            btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
+            Status.Text = "Cursor position was set.";
+        }
+        private void Tog_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (Tog_Click.IsChecked == true)
+            {
+                Tog_Click.ToolTip = "Leftclick?";
+            }
+            else
+            {
+                Tog_Click.ToolTip = "Rightclick?";
             }
         }
-
-        private static readonly Regex _regexPos = new Regex("[^0-9]+");
-        private void Pos(object sender, TextCompositionEventArgs e)
+        private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
-            var textBox = sender as System.Windows.Controls.TextBox;
-            // Block invalid characters
-            if (_regexPos.IsMatch(e.Text))
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Seq files (*.seq)|*.seq|All files (*.*)|*.*";
+            bool? result = saveFileDialog.ShowDialog();
+            if (result == true)
             {
-                e.Handled = true;
-                return;
-            }
-        }
+                string path = saveFileDialog.FileName;
+                StreamWriter sw = new StreamWriter(path);
 
-        private static readonly Regex _regexPosNeg = new Regex("[^0-9+-]+");
-        private void PosNeg(object sender, TextCompositionEventArgs e)
-        {
-            var textBox = sender as System.Windows.Controls.TextBox;
-
-            // Block anything that's not digit, +, or -
-            if (_regexPosNeg.IsMatch(e.Text))
-            {
-                e.Handled = true;
-                return;
-            }
-
-            // Only allow + or - at the beginning, and only once
-            if ((e.Text == "+" || e.Text == "-"))
-            {
-                // Not at the beginning? reject
-                if (textBox.SelectionStart != 0)
+                StringBuilder sb = new StringBuilder();
+                foreach (MyTask t in _sequence)
                 {
-                    e.Handled = true;
-                    return;
+                    sb.Append(t.GetSave());
                 }
-
-                // Already has + or -? reject
-                if (textBox.Text.StartsWith("+") || textBox.Text.StartsWith("-"))
+                try
                 {
-                    e.Handled = true;
-                    return;
+                    sw.WriteLine(sb.ToString());
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Saveing Failed.\n{ex}", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                _saved = true;
+                _savedSequence = _sequence;
+                sw.Close();
+                Update();
             }
         }
+        private void btn_Load_Click(object sender, RoutedEventArgs e)
+        {
+            if (_sequence.Count > 0 && !_saved)
+            {
+                if (MessageBoxResult.Yes == MessageBox.Show("You have an unsaved sequence. Do you want to save it?", "Loading", MessageBoxButton.YesNo))
+                {
+                    btn_Save_Click(sender, e);
+                }
+            }
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Seq files (*.seq)|*.seq|All files (*.*)|*.*";
+            bool? result = openFileDialog.ShowDialog();
+            if (result == true)
+            {
+                string filePath = openFileDialog.FileName;
+                StreamReader sr = new StreamReader(filePath);
+                _sequence.Clear();
+                try
+                {
+                    string saveTxt = sr.ReadToEnd().Trim();
+                    string[] tasks = saveTxt.Split("\n");
+                    foreach (string task in tasks)
+                    {
+                        if (!string.IsNullOrEmpty(task))
+                        {
+                            MyTask t = MyTask.LoadSave(task);
+                            if (t == null)
+                            {
+                                throw new Exception("Save file has wrong values. Loading failed.");
+                            }
+                            _sequence.Add(t);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Loading Failed.\n{ex}", "Error while loading", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _sequence.Clear();
+                }
+                _saved = true;
+                _savedSequence = _sequence;
+                Update();
+                sr.Close();
 
+            }
+        }
+        #endregion
+
+        #region Activation handler
         private void Check_Click()
         {
-            try
-            {
-                if (uint.Parse(TB_Click.Text.Trim()) == 1)
-                {
-                    btn_Click.IsEnabled = true;
-                }
-                else if (uint.Parse(TB_Click.Text.Trim()) > 1 && btn_Delay.IsEnabled)
-                {
-                    btn_Click.IsEnabled = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
-            }
-            catch
-            {
-                btn_Click.IsEnabled = false;
-            }
-        }
-
-        private void TB_Delay_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Delay();
-            Update();
+            btn_Click.IsEnabled = ClickTask.ValidInput(TB_Click.Text, btn_Delay.IsEnabled);
         }
         private void Check_Delay()
         {
-            try
-            {
-                if ((double.TryParse(tb_dmin.Text.Trim(), out double d) && d > 0) || (double.TryParse(tb_dsec.Text.Trim(), out double q) && q > 0))
-                {
-                    btn_Delay.IsEnabled = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
-            }
-            catch
-            {
-                btn_Delay.IsEnabled = false;
-            }
-        }
-
-        private void TB_Move_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Move();
-            Update();
+            btn_Delay.IsEnabled = DelayTask.ValidInput(tb_dmin.Text, tb_dsec.Text);
         }
         private void Check_Move()
         {
@@ -452,17 +498,11 @@ namespace SequenceClicker
                 btn_Test.IsEnabled = false;
             }
         }
-
-        private void TB_Repeats_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Repeat();
-            Update();
-        }
         private void Check_Repeat()
         {
             try
             {
-                if ((int.Parse(TB_Repeats.Text.Trim()) > 0 || Tog_Inf.IsChecked == true) && sequence.Count > 0)
+                if ((int.Parse(TB_Repeats.Text.Trim()) > 0 || Tog_Inf.IsChecked == true) && _sequence.Count > 0)
                 {
                     btn_Start.IsEnabled = true;
                 }
@@ -476,63 +516,82 @@ namespace SequenceClicker
                 btn_Start.IsEnabled = false;
             }
         }
-
-        private void Tog_Inf_Checked(object sender, RoutedEventArgs e)
+        private void Check_Timed()
         {
-            if (Tog_Inf.IsChecked == true)
+            try
             {
-                TB_Repeats.IsEnabled = false;
-                TB_Repeats.Text = "-1";
-                Tog_Inf.ToolTip = "Numbered repeats?";
+                if ((double.TryParse(tb_min.Text.Trim(), out double d) && d > 0) || (double.TryParse(tb_sec.Text.Trim(), out double q) && q > 0))
+                {
+                    btn_Timed.IsEnabled = true;
+                }
+                else
+                {
+                    throw new Exception("False");
+                }
+            }
+            catch
+            {
+                btn_Timed.IsEnabled = false;
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region Input Regex checker
+        private void PosDeci(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.PosDeci(sender, e);
+        }
+        private void Pos(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.Pos(sender, e);
+        }
+        private void PosNeg(object sender, TextCompositionEventArgs e)
+        {
+            RegexTextControl.PosNeg(sender, e);
+        }
+        #endregion
+
+        #region UI updater
+        private void Update(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            Update();
+        }
+        private void Update()
+        {
+            if (_sequence.Count >= 1 && !_saved)
+            {
+                btn_Save.IsEnabled = true;
             }
             else
             {
-                TB_Repeats.IsEnabled = true;
-                Tog_Inf.ToolTip = "Infinite repeats?";
+                btn_Save.IsEnabled = false;
             }
+            Check_Move();
+            Check_Delay();
+            Check_Click();
+            Check_Repeat();
+            Check_Timed();
+        }
+        private void TB_Delay_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            Check_Delay();
             Update();
         }
-
-        private void btn_Test_Click(object sender, RoutedEventArgs e)
+        private void TB_Move_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            SetCursorPos(int.Parse(TB_X.Text), int.Parse(TB_Y.Text));
+            Check_Move();
+            Update();
         }
-
-        private async void btn_Auto_Click(object sender, RoutedEventArgs e)
+        private void TB_Repeats_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\".";
-            btn_Auto.Background = new SolidColorBrush(Colors.Lime);
-            Keyboard.ClearFocus();
-            await WaitForSpace();
-            POINT p;
-            GetCursorPos(out p);
-            TB_X.Text = p.X.ToString();
-            TB_Y.Text = p.Y.ToString();
-            btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
-            Status.Text = "Cursor position was set.";
+            Check_Repeat();
+            Update();
         }
-        private async Task WaitForSpace()
-        {
-            while (true)
-            {
-                if (Keyboard.IsKeyDown(Key.Space))
-                {
-                    return;
-                }
-                await Task.Delay(10);
-            }
-        }
+        #endregion
 
-        public void StopClickTask()
-        {
-            _cts?.Cancel();
-            IsRunning = false;
-            Status.Text = "Autoclicker was canceled.";
-        }
-
-
-
-        #region key detector
+        #region Key detectors
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -563,11 +622,11 @@ namespace SequenceClicker
             if (msg == WM_HOTKEY && wParam.ToInt32() == F6STRGID)
             {
                 // Your event here
-                if (!IsRunning && btn_Start.IsEnabled)
+                if (!_isRunning && btn_Start.IsEnabled)
                 {
-                    IsRunning = true;
+                    _isRunning = true;
                     _cts = new CancellationTokenSource();
-                    _ = RunTasks(new List<MyTask>(sequence), _cts.Token, int.Parse(TB_Repeats.Text.Trim()));
+                    _ = RunTasks(new List<MyTask>(_sequence), _cts.Token, int.Parse(TB_Repeats.Text.Trim()));
                 }
                 handled = true;
             }
@@ -580,7 +639,6 @@ namespace SequenceClicker
 
             return IntPtr.Zero;
         }
-
         protected override void OnClosed(EventArgs e)
         {
             // Cleanup
@@ -590,8 +648,20 @@ namespace SequenceClicker
             UnregisterHotKey(helper.Handle, F7ALTID);
             base.OnClosed(e);
         }
+        private async Task WaitForSpace()
+        {
+            while (true)
+            {
+                if (Keyboard.IsKeyDown(Key.Space))
+                {
+                    return;
+                }
+                await Task.Delay(10);
+            }
+        }
         #endregion
 
+        #region ListBox handler
         private void LB_Seq_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (LB_Seq.SelectedItem != null)
@@ -604,9 +674,6 @@ namespace SequenceClicker
             }
         }
 
-        private Point _dragStartPoint;
-        private AdornerLayer _adornerLayer;
-        private DropInsertionAdorner _dropAdorner;
         private void LB_Seq_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _dragStartPoint = e.GetPosition(null);
@@ -642,8 +709,8 @@ namespace SequenceClicker
                 if (targetItem == null || droppedData == targetItem)
                     return;
 
-                int oldIndex = sequence.IndexOf(droppedData);
-                int newIndex = sequence.IndexOf(targetItem);
+                int oldIndex = _sequence.IndexOf(droppedData);
+                int newIndex = _sequence.IndexOf(targetItem);
 
                 // Decide if above or below
                 var container = listView.ItemContainerGenerator.ContainerFromItem(targetItem) as ListViewItem;
@@ -656,10 +723,10 @@ namespace SequenceClicker
 
                 if (oldIndex != newIndex)
                 {
-                    if (newIndex >= sequence.Count) newIndex = sequence.Count - 1;
-                    sequence.Move(oldIndex, newIndex);
+                    if (newIndex >= _sequence.Count) newIndex = _sequence.Count - 1;
+                    _sequence.Move(oldIndex, newIndex);
 
-                    Saved = false;
+                    _saved = false;
                     Update();
                 }
             }
@@ -703,156 +770,28 @@ namespace SequenceClicker
                 _dropAdorner = null;
             }
         }
-
-        private void Tog_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (Tog_Click.IsChecked == true)
-            {
-                Tog_Click.ToolTip = "Leftclick?";
-            }
-            else
-            {
-                Tog_Click.ToolTip = "Rightclick?";
-            }
-        }
-
-        bool editRunning = false;
-        Window editWindow;
         private void LB_Seq_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (LB_Seq.SelectedItem != null && !editRunning)
+            if (LB_Seq.SelectedItem != null && !_editRunning)
             {
                 string old = LB_Seq.SelectedItem.ToString();
-                editRunning = true;
-                editWindow = new EditWindow(LB_Seq.SelectedItem as MyTask);
+                _editRunning = true;
+                _editWindow = new EditWindow(LB_Seq.SelectedItem as MyTask);
                 AutoClicker.Topmost = false;
-                editWindow.ShowDialog();
-                editRunning = false;
+                _editWindow.ShowDialog();
+                _editRunning = false;
                 AutoClicker.Topmost = true;
                 if (old != LB_Seq.SelectedItem.ToString())
                 {
-                    Saved = false;
+                    _saved = false;
                     Update();
                 }
             }
             else
             {
-                editWindow.Focus();
+                _editWindow.Focus();
             }
         }
-
-        private void btn_Save_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Seq files (*.seq)|*.seq|All files (*.*)|*.*";
-            bool? result = saveFileDialog.ShowDialog();
-            if (result == true)
-            {
-                string path = saveFileDialog.FileName;
-                StreamWriter sw = new StreamWriter(path);
-
-                StringBuilder sb = new StringBuilder();
-                foreach (MyTask t in sequence)
-                {
-                    sb.Append(t.GetSave());
-                }
-                try
-                {
-                    sw.WriteLine(sb.ToString());
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Saveing Failed.\n{ex}", "Error while saving", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                Saved = true;
-                _SavedSequence = sequence;
-                sw.Close();
-                Update();
-            }
-        }
-        private void btn_Load_Click(object sender, RoutedEventArgs e)
-        {
-            if (sequence.Count > 0 && !Saved)
-            {
-                if (MessageBoxResult.Yes == MessageBox.Show("You have an unsaved sequence. Do you want to save it?", "Loading", MessageBoxButton.YesNo))
-                {
-                    btn_Save_Click(sender, e);
-                }
-            }
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Seq files (*.seq)|*.seq|All files (*.*)|*.*";
-            bool? result = openFileDialog.ShowDialog();
-            if (result == true)
-            {
-                string filePath = openFileDialog.FileName;
-                StreamReader sr = new StreamReader(filePath);
-                sequence.Clear();
-                try
-                {
-                    string saveTxt = sr.ReadToEnd().Trim();
-                    string[] tasks = saveTxt.Split("\n");
-                    foreach (string task in tasks)
-                    {
-                        if (!string.IsNullOrEmpty(task))
-                        {
-                            MyTask t = MyTask.LoadSave(task);
-                            if (t == null)
-                            {
-                                throw new Exception("Save file has wrong values. Loading failed.");
-                            }
-                            sequence.Add(t);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Loading Failed.\n{ex}", "Error while loading", MessageBoxButton.OK, MessageBoxImage.Error);
-                    sequence.Clear();
-                }
-                Saved = true;
-                _SavedSequence = sequence;
-                Update();
-                sr.Close();
-
-            }
-        }
-
-        private void btn_Timed_Click(object sender, RoutedEventArgs e)
-        {
-            if (Timed)
-            {
-                Timed = false;
-                btn_Timed.Background = new SolidColorBrush(Colors.LightGray);
-                tb_min.IsEnabled = true;
-                tb_sec.IsEnabled = true;
-            }
-            else
-            {
-                Timed = true;
-                btn_Timed.Background = new SolidColorBrush(Colors.Lime);
-                tb_min.IsEnabled = false;
-                tb_sec.IsEnabled = false;
-                double min;
-                try
-                {
-                    min = double.Parse(tb_min.Text.Trim());
-                }
-                catch
-                {
-                    min = 0;
-                }
-
-                double sec;
-                try
-                {
-                    sec = double.Parse(tb_sec.Text.Trim());
-                }
-                catch
-                {
-                    sec = 0;
-                }
-                sequence.Add(new TimedTask(min * 60 + sec, true));
-            }
-        }
+        #endregion
     }
 }
