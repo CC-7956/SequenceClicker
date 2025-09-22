@@ -361,12 +361,10 @@ namespace SequenceClicker
             {
                 TB_Repeats.IsEnabled = false;
                 TB_Repeats.Text = "-1";
-                Tog_Inf.ToolTip = "Numbered repeats?";
             }
             else
             {
                 TB_Repeats.IsEnabled = true;
-                Tog_Inf.ToolTip = "Infinite repeats?";
             }
             Update();
         }
@@ -376,27 +374,22 @@ namespace SequenceClicker
         }
         private async void btn_Auto_Click(object sender, RoutedEventArgs e)
         {
-            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\".";
+            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\". Press \"Backspace\" to cancel.";
             btn_Auto.Background = new SolidColorBrush(Colors.Lime);
             Keyboard.ClearFocus();
-            await WaitForSpace();
+            bool _continue = await WaitForSpace();
+            if (!_continue)
+            {
+                Status.Text = "Setting cursor position was canceled.";
+                btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
+                return;
+            }
             POINT p;
             GetCursorPos(out p);
             TB_X.Text = p.X.ToString();
             TB_Y.Text = p.Y.ToString();
             btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
             Status.Text = "Cursor position was set.";
-        }
-        private void Tog_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (Tog_Click.IsChecked == true)
-            {
-                Tog_Click.ToolTip = "Leftclick?";
-            }
-            else
-            {
-                Tog_Click.ToolTip = "Rightclick?";
-            }
         }
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
@@ -654,13 +647,17 @@ namespace SequenceClicker
             UnregisterHotKey(helper.Handle, F7ALTID);
             base.OnClosed(e);
         }
-        private async Task WaitForSpace()
+        private async Task<bool> WaitForSpace()
         {
             while (true)
             {
                 if (Keyboard.IsKeyDown(Key.Space))
                 {
-                    return;
+                    return true;
+                }
+                if (Keyboard.IsKeyDown(Key.Back))
+                {
+                    return false;
                 }
                 await Task.Delay(10);
             }

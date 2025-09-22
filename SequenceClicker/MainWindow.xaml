@@ -13,7 +13,34 @@
             <Button x:Name="btn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="50" Focusable="False" Content="Click" FontSize="15" Click="btn_AddClick"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,7,0,0" Focusable="False" ToolTip="If >1 enter a number in Delay Box" Content="Click repeats:" FontSize="15"/>
             <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,11,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
-            <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,11,0,0" Height="22" Width="22" Focusable="False" ToolTip="Rightclick?" Click="Tog_Clicked"/>
+            <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,11,0,0" Height="22" Width="22" Focusable="False">
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Rectangle Stroke="Gray" StrokeThickness="1" Fill="{TemplateBinding Background}"/>
+                            <TextBlock x:Name="TXT" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,1,2" FontSize="20"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="Khaki"/>
+                                <Setter Property="ToolTip" Value="Rightclick"/>
+                                <Setter TargetName="TXT" Property="Text" Value="R"/>
+                                <Setter TargetName="TXT" Property="Foreground" Value="#8C96F0"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="Background" Value="CornflowerBlue"/>
+                                <Setter Property="ToolTip" Value="Leftclick"/>
+                                <Setter TargetName="TXT" Property="Text" Value="L"/>
+                                <Setter TargetName="TXT" Property="Foreground" Value="#EDBC64"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </ToggleButton.Template>
+            </ToggleButton>
 
             <Button x:Name="btn_Delay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Delay" FontSize="15" Click="btn_AddDelay"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,37,0,0" Focusable="False" Content="Min:" FontSize="15"/>
@@ -39,7 +66,27 @@
             <Button x:Name="btn_Start" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,160,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Start" FontSize="15" Click="btn_Start_Click"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,157,0,0" Focusable="False" Content="Total repeats:" FontSize="15"/>
             <TextBox x:Name="TB_Repeats" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,161,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
-            <ToggleButton x:Name="Tog_Inf" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,161,0,0" Height="22" Width="22" Focusable="False" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
+            <ToggleButton x:Name="Tog_Inf" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,161,0,0" Height="22" Width="22" Focusable="False" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?">
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Rectangle Stroke="Gray" StrokeThickness="1" Fill="{TemplateBinding Background}"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="YellowGreen"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="Background" Value="LightCoral"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </ToggleButton.Template>
+            </ToggleButton>
 
             <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,90" Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10"/>
 
