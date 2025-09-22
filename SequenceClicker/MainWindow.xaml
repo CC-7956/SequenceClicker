@@ -102,13 +102,17 @@
                       PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" 
                       MouseMove="LB_Seq_MouseMove" 
                       DragOver="LB_Seq_DragOver"
-                      Drop="LB_Seq_Drop"
-                      MouseDoubleClick="LB_Seq_MouseDoubleClick">
+                      Drop="LB_Seq_Drop">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding DisplayText}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="LB_Seq_MouseDoubleClick"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
         </Grid>
     </Viewbox>

@@ -6,8 +6,8 @@ namespace SequenceClicker
 {
     public class DropInsertionAdorner : Adorner
     {
-        private bool _isAbove;
-        private UIElement _adornedElement;
+        private readonly bool _isAbove;
+        private readonly UIElement _adornedElement;
 
         public DropInsertionAdorner(UIElement adornedElement, bool isAbove)
             : base(adornedElement)
@@ -21,8 +21,8 @@ namespace SequenceClicker
         {
             var rect = new Rect(_adornedElement.RenderSize);
             double y = _isAbove ? 0 : rect.Bottom;
-
             var pen = new Pen(Brushes.Red, 2);
+            pen.Freeze();
             drawingContext.DrawLine(pen, new Point(0, y), new Point(rect.Right, y));
         }
     }
