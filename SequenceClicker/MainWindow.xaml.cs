@@ -374,10 +374,16 @@ namespace SequenceClicker
         }
         private async void btn_Auto_Click(object sender, RoutedEventArgs e)
         {
-            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\".";
+            Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\". Press \"Backspace\" to cancel.";
             btn_Auto.Background = new SolidColorBrush(Colors.Lime);
             Keyboard.ClearFocus();
-            await WaitForSpace();
+            bool _continue = await WaitForSpace();
+            if (!_continue)
+            {
+                Status.Text = "Setting cursor position was canceled.";
+                btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
+                return;
+            }
             POINT p;
             GetCursorPos(out p);
             TB_X.Text = p.X.ToString();
@@ -641,13 +647,17 @@ namespace SequenceClicker
             UnregisterHotKey(helper.Handle, F7ALTID);
             base.OnClosed(e);
         }
-        private async Task WaitForSpace()
+        private async Task<bool> WaitForSpace()
         {
             while (true)
             {
                 if (Keyboard.IsKeyDown(Key.Space))
                 {
-                    return;
+                    return true;
+                }
+                if (Keyboard.IsKeyDown(Key.Back))
+                {
+                    return false;
                 }
                 await Task.Delay(10);
             }
