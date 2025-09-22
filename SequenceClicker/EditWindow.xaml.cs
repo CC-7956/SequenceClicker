@@ -345,13 +345,21 @@ namespace SequenceClicker
             }
         }
         #endregion
-        private async Task WaitForSpace()
+        /// <summary>
+        /// Waits until the spacebar is pressed
+        /// </summary>
+        /// <author>CC-7956</author>
+        private async Task<bool> WaitForSpace()
         {
             while (true)
             {
                 if (Keyboard.IsKeyDown(Key.Space))
                 {
-                    return;
+                    return true;
+                }
+                if (Keyboard.IsKeyDown(Key.Back))
+                {
+                    return false;
                 }
                 await Task.Delay(10);
             }
