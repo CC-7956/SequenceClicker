@@ -112,6 +112,13 @@ namespace SequenceClicker
         }
 
         #region Functionallity
+        /// <summary>
+        /// Executor of the given task sequence
+        /// </summary>
+        /// <param name="currendSeq">The current sequence</param>
+        /// <param name="token">Non canceled Token</param>
+        /// <param name="repeats">Number of repeats</param>
+        /// <author>CC-7956</author>
         private async Task RunTasks(List<MyTask> currendSeq, CancellationToken token, int repeats)
         {
             AutoClicker.Topmost = true;
@@ -162,6 +169,15 @@ namespace SequenceClicker
             Status.Text = "Autoclicker stoped.";
             AutoClicker.Topmost = false;
         }
+
+        /// <summary>
+        /// Executor of a click task
+        /// </summary>
+        /// <param name="inputs">Input sequence</param>
+        /// <param name="repeats">Number of repeats</param>
+        /// <param name="delay">Delay in ms between every click</param>
+        /// <param name="token">Non canceled Token</param>
+        /// <author>CC-7956</author>
         private async Task DoClick(INPUT[] inputs, int repeats, int delay, CancellationToken token)
         {
             for (int i = 0; i < repeats; i++)
@@ -171,15 +187,34 @@ namespace SequenceClicker
             }
             await Task.Delay(0, token);
         }
+
+        /// <summary>
+        /// Executor of a delay task
+        /// </summary>
+        /// <param name="delay">Delay in ms</param>
+        /// <param name="token">Non canceled Token</param>
+        /// <author>CC-7956</author>
         private async Task DoDelay(int delay, CancellationToken token)
         {
             await Task.Delay(delay, token);
         }
+
+        /// <summary>
+        /// Executor of a move task
+        /// </summary>
+        /// <param name="x">Relativ X coordinate</param>
+        /// <param name="y">Relativ Y coordinate</param>
+        /// <param name="token">Non canceled Token</param>
+        /// <author>CC-7956</author>
         private async Task DoMove(int x, int y, CancellationToken token)
         {
             SetCursorPos(x, y);
             await Task.Delay(0, token);
         }
+        /// <summary>
+        /// Stops the current running sequence
+        /// </summary>
+        /// <author>CC-7956 / ChatGPT</author>
         public void StopClickTask()
         {
             _cts?.Cancel();
@@ -193,6 +228,12 @@ namespace SequenceClicker
         #region Buttons
 
         #region Add
+        /// <summary>
+        /// Adds a Click Task to the sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_AddClick(object sender, RoutedEventArgs e)
         {
             ClickTask t;
@@ -240,6 +281,13 @@ namespace SequenceClicker
             Update();
             _saved = false;
         }
+
+        /// <summary>
+        /// Adds a Delay Task to the sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_AddDelay(object sender, RoutedEventArgs e)
         {
             double min = -1;
@@ -276,6 +324,13 @@ namespace SequenceClicker
             Update();
             _saved = false;
         }
+
+        /// <summary>
+        /// Adds a Move Task to the sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_AddMove(object sender, RoutedEventArgs e)
         {
             MoveTask t = new MoveTask(int.Parse(TB_X.Text.Trim()), int.Parse(TB_Y.Text.Trim()));
@@ -284,6 +339,13 @@ namespace SequenceClicker
             Update();
             _saved = false;
         }
+
+        /// <summary>
+        /// Adds a Timed Task to the sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_AddTimed(object sender, RoutedEventArgs e)
         {
             if (_timed)
@@ -324,6 +386,12 @@ namespace SequenceClicker
         #endregion
 
         #region Funtionallity
+        /// <summary>
+        /// Deletes the selected task from the sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_Delete_Click(object sender, RoutedEventArgs e)
         {
             if (_sequence.Count > 0 && LB_Seq.SelectedItem != null)
@@ -335,6 +403,13 @@ namespace SequenceClicker
                 _saved = false;
             }
         }
+
+        /// <summary>
+        /// Resets the current sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_Reset_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult res = MessageBox.Show("Are you sure you want to reset the sequence", "Reset warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
@@ -346,6 +421,13 @@ namespace SequenceClicker
             Update();
             _saved = false;
         }
+
+        /// <summary>
+        /// Starts execution of the current sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956 / ChatGPT</author>
         private void btn_Start_Click(object sender, RoutedEventArgs e)
         {
             if (!_isRunning)
@@ -355,6 +437,13 @@ namespace SequenceClicker
                 _ = RunTasks(new List<MyTask>(_sequence), _cts.Token, int.Parse(TB_Repeats.Text.Trim()));
             }
         }
+
+        /// <summary>
+        /// Toggles the amount of repeats between infinite and a given number
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void Tog_Inf_Checked(object sender, RoutedEventArgs e)
         {
             if (Tog_Inf.IsChecked == true)
@@ -368,10 +457,24 @@ namespace SequenceClicker
             }
             Update();
         }
+
+        /// <summary>
+        /// Moves the cursor to the given position
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_Test_Click(object sender, RoutedEventArgs e)
         {
             SetCursorPos(int.Parse(TB_X.Text), int.Parse(TB_Y.Text));
         }
+
+        /// <summary>
+        /// Gets the current cursor position and sets the X and Y textboxes
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956 / ChatGPT</author>
         private async void btn_Auto_Click(object sender, RoutedEventArgs e)
         {
             Status.Text = "Move your cursor to the wanted location and confirm the position by pressing \"Spacebar\".";
@@ -385,6 +488,13 @@ namespace SequenceClicker
             btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
             Status.Text = "Cursor position was set.";
         }
+
+        /// <summary>
+        /// Saves the current sequence to a .seq file
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -414,6 +524,13 @@ namespace SequenceClicker
                 Update();
             }
         }
+
+        /// <summary>
+        /// Loads a .seq file to the current sequence
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void btn_Load_Click(object sender, RoutedEventArgs e)
         {
             if (_sequence.Count > 0 && !_saved)
@@ -463,14 +580,27 @@ namespace SequenceClicker
         #endregion
 
         #region Activation handler
+        /// <summary>
+        /// Checks if the input for the Click Task is valid and enables/disables the add button
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Check_Click()
         {
             btn_Click.IsEnabled = ClickTask.ValidInput(TB_Click.Text, btn_Delay.IsEnabled);
         }
+
+        /// <summary>
+        /// Checks if the input for the Delay Task is valid and enables/disables the add button
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Check_Delay()
         {
             btn_Delay.IsEnabled = DelayTask.ValidInput(tb_dmin.Text, tb_dsec.Text);
         }
+        /// <summary>
+        /// Checks if the input for the Move Task is valid and enables/disables the add and test button
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Check_Move()
         {
             try
@@ -491,6 +621,11 @@ namespace SequenceClicker
                 btn_Test.IsEnabled = false;
             }
         }
+
+        /// <summary>
+        /// Checks if the input for the Repeat count is valid and enables/disables the start button
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Check_Repeat()
         {
             try
@@ -509,6 +644,10 @@ namespace SequenceClicker
                 btn_Start.IsEnabled = false;
             }
         }
+        /// <summary>
+        /// Ckecks if the input for the Timed Task is valid and enables/disables the add button
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Check_Timed()
         {
             try
@@ -532,14 +671,34 @@ namespace SequenceClicker
         #endregion
 
         #region Input Regex checker
+        /// <summary>
+        /// Checks if the input is a positive decimal number
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void PosDeci(object sender, TextCompositionEventArgs e)
         {
             RegexTextControl.PosDeci(sender, e);
         }
+
+        /// <summary>
+        /// Checks if the input is a positive integer number
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void Pos(object sender, TextCompositionEventArgs e)
         {
             RegexTextControl.Pos(sender, e);
         }
+
+        /// <summary>
+        /// Checks if the input is a integer number
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void PosNeg(object sender, TextCompositionEventArgs e)
         {
             RegexTextControl.PosNeg(sender, e);
@@ -547,10 +706,21 @@ namespace SequenceClicker
         #endregion
 
         #region UI updater
+        /// <summary>
+        /// Helper function to update the UI after a change
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void Update(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             Update();
         }
+
+        /// <summary>
+        /// Method to update the UI after a change
+        /// </summary>
+        /// <author>CC-7956</author>
         private void Update()
         {
             if (_sequence.Count >= 1 && !_saved)
@@ -567,24 +737,14 @@ namespace SequenceClicker
             Check_Repeat();
             Check_Timed();
         }
-        private void TB_Delay_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Delay();
-            Update();
-        }
-        private void TB_Move_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Move();
-            Update();
-        }
-        private void TB_Repeats_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Check_Repeat();
-            Update();
-        }
         #endregion
 
         #region Key detectors
+        /// <summary>
+        /// Registers the hotkeys and hooks into the WndProc
+        /// </summary>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -602,6 +762,15 @@ namespace SequenceClicker
             source.AddHook(HwndHook);
         }
 
+        /// <summary>
+        /// Handles the hotkey messages
+        /// </summary>
+        /// <param name="hwnd">hwnd</param>
+        /// <param name="msg">Message</param>
+        /// <param name="wParam">wParam</param>
+        /// <param name="lParam">lParam</param>
+        /// <param name="handled">handled</param>
+        /// <author>ChatGPT</author>
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             const int WM_HOTKEY = 0x0312;
@@ -632,6 +801,11 @@ namespace SequenceClicker
 
             return IntPtr.Zero;
         }
+        /// <summary>
+        /// Unregisters the hotkeys
+        /// </summary>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         protected override void OnClosed(EventArgs e)
         {
             // Cleanup
@@ -641,6 +815,10 @@ namespace SequenceClicker
             UnregisterHotKey(helper.Handle, F7ALTID);
             base.OnClosed(e);
         }
+        /// <summary>
+        /// Waits until the spacebar is pressed
+        /// </summary>
+        /// <author>CC-7956</author>
         private async Task WaitForSpace()
         {
             while (true)
@@ -655,6 +833,12 @@ namespace SequenceClicker
         #endregion
 
         #region ListBox handler
+        /// <summary>
+        /// Selection changed event to enable/disable the delete button
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>CC-7956</author>
         private void LB_Seq_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (LB_Seq.SelectedItem != null)
@@ -666,11 +850,19 @@ namespace SequenceClicker
                 btn_Delete.IsEnabled = false;
             }
         }
+
+        /// <summary>
+        /// Double click event to open the edit window for the selected task
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         private void LB_Seq_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (LB_Seq.SelectedItem != null && !_editRunning)
+            MyTask item = (sender as ListViewItem)?.DataContext as MyTask;
+            if (item != null && !_editRunning)
             {
-                string old = LB_Seq.SelectedItem.ToString();
+                string old = item.ToString();
                 _editRunning = true;
                 _editWindow = new EditWindow(LB_Seq.SelectedItem as MyTask);
                 AutoClicker.Topmost = false;
@@ -688,7 +880,14 @@ namespace SequenceClicker
                 _editWindow.Focus();
             }
         }
-        // --- PREVIEW MOUSE DOWN (record start and dragged item) ---
+
+        /// <summary>
+        /// Drag and drop initialization. <br/>
+        /// Mouse down event.
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         private void LB_Seq_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _dragStartPoint = e.GetPosition(null);
@@ -703,7 +902,13 @@ namespace SequenceClicker
             }
         }
 
-        // --- MOUSE MOVE (start drag) ---
+        /// <summary>
+        /// Drag and drop inprogress. <br/>
+        /// Mouse move event.
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         private void LB_Seq_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed || _draggedItem == null)
@@ -729,7 +934,13 @@ namespace SequenceClicker
             RemoveDropAdorner();
         }
 
-        // --- DRAG OVER (update adorner + effect) ---
+        /// <summary>
+        /// Drag and drop processing. <br/>
+        /// Drag over event.
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         private void LB_Seq_DragOver(object sender, DragEventArgs e)
         {
             // only accept MyTask (or derived)
@@ -812,8 +1023,12 @@ namespace SequenceClicker
             }
         }
 
-
-        // --- DROP (perform re-order) ---
+        /// <summary>
+        /// Drag and Drop finalization. <br/>
+        /// Drop event.
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
         private void LB_Seq_Drop(object sender, DragEventArgs e)
         {
             RemoveDropAdorner();
@@ -877,13 +1092,23 @@ namespace SequenceClicker
             Update();
         }
 
-        // --- DRAG LEAVE (clean up) ---
+        /// <summary>
+        /// Drag and Drop leave. <br/>
+        /// Preview Drag Leave event.
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event</param>
+        /// <author>ChatGPT</author>
         private void LB_Seq_PreviewDragLeave(object sender, DragEventArgs e)
         {
             RemoveDropAdorner();
         }
 
-        // --- REMOVE ADORNER helper ---
+        /// <summary>
+        /// Drag and Drop clean up. <br/>
+        /// Removes the drop adorner if present.
+        /// </summary>
+        /// <author>ChatGPT</author>
         private void RemoveDropAdorner()
         {
             if (_dropAdorner != null && _adornerLayer != null)
@@ -892,30 +1117,6 @@ namespace SequenceClicker
                 _dropAdorner = null;
             }
             _currentDropTarget = (null, false, -1);
-        }
-
-        // --- ADORNER CLASS (draws the red insertion line) ---
-        public class DropInsertionAdorner : Adorner
-        {
-            private readonly bool _isAbove;
-            private readonly UIElement _adornedElement;
-
-            public DropInsertionAdorner(UIElement adornedElement, bool isAbove)
-                : base(adornedElement)
-            {
-                _adornedElement = adornedElement;
-                _isAbove = isAbove;
-                IsHitTestVisible = false;
-            }
-
-            protected override void OnRender(DrawingContext drawingContext)
-            {
-                var rect = new Rect(_adornedElement.RenderSize);
-                double y = _isAbove ? 0 : rect.Bottom;
-                var pen = new Pen(Brushes.Red, 2);
-                pen.Freeze();
-                drawingContext.DrawLine(pen, new Point(0, y), new Point(rect.Right, y));
-            }
         }
         #endregion
     }
