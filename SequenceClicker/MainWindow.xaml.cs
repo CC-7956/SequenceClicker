@@ -361,12 +361,10 @@ namespace SequenceClicker
             {
                 TB_Repeats.IsEnabled = false;
                 TB_Repeats.Text = "-1";
-                Tog_Inf.ToolTip = "Numbered repeats?";
             }
             else
             {
                 TB_Repeats.IsEnabled = true;
-                Tog_Inf.ToolTip = "Infinite repeats?";
             }
             Update();
         }
@@ -386,17 +384,6 @@ namespace SequenceClicker
             TB_Y.Text = p.Y.ToString();
             btn_Auto.Background = new SolidColorBrush(Colors.LightGray);
             Status.Text = "Cursor position was set.";
-        }
-        private void Tog_Clicked(object sender, RoutedEventArgs e)
-        {
-            if (Tog_Click.IsChecked == true)
-            {
-                Tog_Click.ToolTip = "Leftclick?";
-            }
-            else
-            {
-                Tog_Click.ToolTip = "Rightclick?";
-            }
         }
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
