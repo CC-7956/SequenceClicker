@@ -57,11 +57,12 @@
             <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,100,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
             <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="140,100,0,0" Width="50" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
 
-            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Time" FontSize="15" Click="btn_AddTimed"/> <!--WIP-->
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,127,0,0" Focusable="False" Content="Min:" FontSize="15" /> <!--WIP-->
-            <TextBox x:Name="tb_min" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" Content="Sec:" FontSize="15" /> <!--WIP-->
-            <TextBox x:Name="tb_sec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
+            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Visibility="Collapsed" Content="Time" FontSize="15" Click="btn_AddTimed"/> <!--WIP-->
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,127,0,0" Focusable="False" Visibility="Collapsed" Content="Min:" FontSize="15" /> <!--WIP-->
+            <TextBox x:Name="tb_min" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,131,0,0" Width="50" Visibility="Collapsed" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" Visibility="Collapsed" Content="Sec:" FontSize="15" /> <!--WIP-->
+            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" Visibility="Collapsed" Content="Sec:" FontSize="15" /> <!--WIP-->
+            <TextBox x:Name="tb_sec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,131,0,0" Width="50" Visibility="Collapsed" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> <!--WIP-->
 
             <Button x:Name="btn_Start" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,160,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Start" FontSize="15" Click="btn_Start_Click"/>
             <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,157,0,0" Focusable="False" Content="Total repeats:" FontSize="15"/>
