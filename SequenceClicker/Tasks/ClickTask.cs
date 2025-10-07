@@ -113,7 +113,20 @@ namespace SequenceClicker.Tasks
             }
             if (Repeats > 1)
             {
-                s += $" w. {Delay}s delay";
+                var parts = new List<string>();
+                TimeSpan ts = TimeSpan.FromMilliseconds(Delay);
+                if (ts.Hours > 0)
+                    parts.Add($"{ts.Hours}h");
+                if (ts.Minutes > 0)
+                    parts.Add($"{ts.Minutes}m");
+                if (ts.Seconds > 0)
+                    parts.Add($"{ts.Seconds}s");
+                if (ts.Milliseconds > 0)
+                    parts.Add($"{ts.Milliseconds}ms");
+                // fallback: if all are 0, show "0ms"
+                if (parts.Count == 0)
+                    parts.Add("0ms");
+                s += $" w. {string.Join(" ", parts)} delay";
             }
             return s;
         }

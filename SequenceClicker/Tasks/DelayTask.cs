@@ -42,7 +42,7 @@ namespace SequenceClicker.Tasks
 
         public static bool ValidInput(string min, string sec)
         {
-            if ((double.TryParse(min.Trim(), out double d) && d > 0) || (double.TryParse(sec.Trim(), out double q) && q > 0))
+            if ((double.TryParse(min.Trim(), out double d) && d >= 0.00001) || (double.TryParse(sec.Trim(), out double q) && q >= 0.001))
             {
                 return true;
             }
@@ -51,9 +51,10 @@ namespace SequenceClicker.Tasks
 
         public override string ToString()
         {
-            TimeSpan ts = TimeSpan.FromMilliseconds(_delay);
             var parts = new List<string>();
             parts.Add("Delay ");
+
+            TimeSpan ts = TimeSpan.FromMilliseconds(_delay);
             if (ts.Hours > 0)
                 parts.Add($"{ts.Hours}h");
             if (ts.Minutes > 0)
@@ -62,11 +63,9 @@ namespace SequenceClicker.Tasks
                 parts.Add($"{ts.Seconds}s");
             if (ts.Milliseconds > 0)
                 parts.Add($"{ts.Milliseconds}ms");
-
             // fallback: if all are 0, show "0ms"
-            if (parts.Count == 0)
+            if (parts.Count == 1)
                 parts.Add("0ms");
-
             return string.Join(" ", parts);
         }
     }

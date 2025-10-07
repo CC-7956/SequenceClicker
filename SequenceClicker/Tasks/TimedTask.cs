@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace SequenceClicker.Tasks
 {
@@ -31,18 +26,21 @@ namespace SequenceClicker.Tasks
                 _subSeq = value;
             }
         }
-        private bool _IsStart;
 
-        public TimedTask(double time, bool start)
+        public TimedTask(double time)
         {
             Time = time;
             SubSeq = new ObservableCollection<MyTask>();
-            _IsStart = start;
         }
 
-
-
-
+        public static bool ValidInput(string min, string sec)
+        {
+            if ((double.TryParse(min.Trim(), out double d) && d >= 0.00001) || (double.TryParse(sec.Trim(), out double q) && q >= 0.001))
+            {
+                return true;
+            }
+            return false;
+        }
 
         public override string GetSave()
         {
@@ -55,26 +53,25 @@ namespace SequenceClicker.Tasks
             TimeSpan ts = TimeSpan.FromMilliseconds(totalMilliseconds);
             var parts = new List<string>();
             parts.Add("Timed");
-            if (_IsStart)
-            {
-                parts.Add("start");
-                if (ts.Hours > 0)
-                    parts.Add($"{ts.Hours}h");
-                if (ts.Minutes > 0)
-                    parts.Add($"{ts.Minutes}m");
-                if (ts.Seconds > 0)
-                    parts.Add($"{ts.Seconds}s");
-                if (ts.Milliseconds > 0)
-                    parts.Add($"{ts.Milliseconds}ms");
+            if (ts.Hours > 0)
+                parts.Add($"{ts.Hours}h");
+            if (ts.Minutes > 0)
+                parts.Add($"{ts.Minutes}m");
+            if (ts.Seconds > 0)
+                parts.Add($"{ts.Seconds}s");
+            if (ts.Milliseconds > 0)
+                parts.Add($"{ts.Milliseconds}ms");
 
-                // fallback: if all are 0, show "0ms"
-                if (parts.Count == 0)
-                    parts.Add("0ms");
-            }
-            else
+            // fallback: if all are 0, show "0ms"
+            if (parts.Count == 1)
+                parts.Add("0ms");
+
+            foreach (var task in SubSeq)
             {
-                parts.Add("end");
+                parts.Add("\n  ");
+                parts.Add(task.ToString());
             }
+
             return string.Join(" ", parts);
         }
     }

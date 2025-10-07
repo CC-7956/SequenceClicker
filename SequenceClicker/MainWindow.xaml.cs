@@ -88,9 +88,9 @@ namespace SequenceClicker
         private bool _isRunning = false;
         private bool _editRunning = false;
         private bool _saved = false;
-        private bool _timed = false;
 
         private CancellationTokenSource _cts;
+        private CancellationTokenSource _ctsTimed;
 
         private ObservableCollection<MyTask> _savedSequence = new ObservableCollection<MyTask>();
         private ObservableCollection<MyTask> _sequence = new ObservableCollection<MyTask>();
@@ -160,6 +160,21 @@ namespace SequenceClicker
                     {
                         await DoMove(move.XPos, move.YPos, token);
                     }
+                    if (task is TimedTask timed)
+                    {
+                        _ctsTimed = new CancellationTokenSource();
+
+                        // Start tracking time but don't await yet
+                        var trackingTask = TrackTime(timed.Time);
+
+                        // Run the timed sequence
+                        await DoTimed(timed.SubSeq);
+
+                        _ctsTimed = null;
+
+                        // Optionally wait for tracking to finish (usually unnecessary)
+                        await trackingTask;
+                    }
                 }
 
                 if (token.IsCancellationRequested)
@@ -168,6 +183,21 @@ namespace SequenceClicker
             _isRunning = false;
             Status.Text = "Autoclicker stoped.";
             AutoClicker.Topmost = false;
+        }
+
+        private async Task DoTimed(ObservableCollection<MyTask> subSeq)
+        {
+            try
+            {
+                while (!_ctsTimed.IsCancellationRequested)
+                {
+                    await RunTasks(new List<MyTask>(subSeq), _ctsTimed.Token, int.MaxValue);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Timed task was canceled
+            }
         }
 
         /// <summary>
@@ -222,6 +252,15 @@ namespace SequenceClicker
             Status.Text = "Autoclicker was canceled.";
             AutoClicker.Topmost = false;
 
+        }
+        /// <summary>
+        /// Waits until the timer has run out and then cancels the timed task
+        /// </summary>
+        /// <param name="time">Time to run the sub sequence</param>
+        public async Task TrackTime(double time)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(time));
+            _ctsTimed?.Cancel();
         }
         #endregion
 
@@ -348,40 +387,30 @@ namespace SequenceClicker
         /// <author>CC-7956</author>
         private void btn_AddTimed(object sender, RoutedEventArgs e)
         {
-            if (_timed)
+            TimedTask tt;
+            double min;
+            try
             {
-                _timed = false;
-                btn_Timed.Background = new SolidColorBrush(Colors.LightGray);
-                tb_min.IsEnabled = true;
-                tb_sec.IsEnabled = true;
+                min = double.Parse(tb_min.Text.Trim());
             }
-            else
+            catch
             {
-                _timed = true;
-                btn_Timed.Background = new SolidColorBrush(Colors.Lime);
-                tb_min.IsEnabled = false;
-                tb_sec.IsEnabled = false;
-                double min;
-                try
-                {
-                    min = double.Parse(tb_min.Text.Trim());
-                }
-                catch
-                {
-                    min = 0;
-                }
+                min = 0;
+            }
 
-                double sec;
-                try
-                {
-                    sec = double.Parse(tb_sec.Text.Trim());
-                }
-                catch
-                {
-                    sec = 0;
-                }
-                _sequence.Add(new TimedTask(min * 60 + sec, true));
+            double sec;
+            try
+            {
+                sec = double.Parse(tb_sec.Text.Trim());
             }
+            catch
+            {
+                sec = 0;
+            }
+            tt = new TimedTask(min * 60 + sec);
+            _sequence.Add(tt);
+            EditTimedWindow editTimed = new EditTimedWindow(tt);
+            editTimed.ShowDialog();
         }
         #endregion
 
@@ -656,21 +685,7 @@ namespace SequenceClicker
         /// <author>CC-7956</author>
         private void Check_Timed()
         {
-            try
-            {
-                if ((double.TryParse(tb_min.Text.Trim(), out double d) && d > 0) || (double.TryParse(tb_sec.Text.Trim(), out double q) && q > 0))
-                {
-                    btn_Timed.IsEnabled = true;
-                }
-                else
-                {
-                    throw new Exception("False");
-                }
-            }
-            catch
-            {
-                btn_Timed.IsEnabled = false;
-            }
+            btn_Timed.IsEnabled = TimedTask.ValidInput(tb_min.Text, tb_sec.Text);
         }
         #endregion
 
@@ -875,7 +890,10 @@ namespace SequenceClicker
             {
                 string old = item.ToString();
                 _editRunning = true;
-                _editWindow = new EditWindow(LB_Seq.SelectedItem as MyTask);
+                if (item is TimedTask)
+                    _editWindow = new EditTimedWindow(item as TimedTask);
+                else
+                    _editWindow = new EditWindow(LB_Seq.SelectedItem as MyTask);
                 AutoClicker.Topmost = false;
                 _editWindow.ShowDialog();
                 _editRunning = false;
