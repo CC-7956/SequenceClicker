@@ -479,10 +479,12 @@ namespace SequenceClicker
             {
                 TB_Repeats.IsEnabled = false;
                 TB_Repeats.Text = "-1";
+                btn_Start.Content = "Run infinite times";
             }
             else
             {
                 TB_Repeats.IsEnabled = true;
+                btn_Start.Content = "Run x times";
             }
             Update();
         }

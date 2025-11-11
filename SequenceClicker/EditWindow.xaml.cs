@@ -300,7 +300,7 @@ namespace SequenceClicker
             if (task is ClickTask click)
             {
                 click.IsLeftclick = Tog_Click.IsChecked == true ? false : true;
-                if(int.TryParse(TB_Click.Text.Trim(), out int rep) && rep > 1)
+                if (int.TryParse(TB_Click.Text.Trim(), out int rep) && rep > 1)
                 {
                     click.Repeats = rep;
                     try

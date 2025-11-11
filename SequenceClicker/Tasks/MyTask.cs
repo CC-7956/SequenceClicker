@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace SequenceClicker.Tasks

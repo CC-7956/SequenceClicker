@@ -6,114 +6,139 @@
         xmlns:local="clr-namespace:SequenceClicker"
         mc:Ignorable="d"
         x:Name="AutoClicker"
-        ResizeMode="CanMinimize"
-        Title="Super Cooler Sequenzen Clicker" Height="420" Width="450">
+        Title="Super Cooler Sequenzen Clicker">
     <Viewbox>
-        <Grid Height="400" Width="450">
-            <Button x:Name="btn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="50" Focusable="False" Content="Click" FontSize="15" Click="btn_AddClick"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,7,0,0" Focusable="False" ToolTip="If >1 fill in the Delay values" Content="Click repeats:" FontSize="15"/>
-            <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,11,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
-            <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,11,0,0" Height="22" Width="22" Focusable="False">
-                <ToggleButton.Template>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Rectangle Stroke="Gray" StrokeThickness="1" Fill="{TemplateBinding Background}"/>
-                            <TextBlock x:Name="TXT" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,1,2" FontSize="20"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="Khaki"/>
-                                <Setter Property="ToolTip" Value="Rightclick"/>
-                                <Setter TargetName="TXT" Property="Text" Value="R"/>
-                                <Setter TargetName="TXT" Property="Foreground" Value="#8C96F0"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter Property="Background" Value="CornflowerBlue"/>
-                                <Setter Property="ToolTip" Value="Leftclick"/>
-                                <Setter TargetName="TXT" Property="Text" Value="L"/>
-                                <Setter TargetName="TXT" Property="Foreground" Value="#EDBC64"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Cursor" Value="Hand"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </ToggleButton.Template>
-            </ToggleButton>
+        <Grid>
+            <StackPanel Orientation="Horizontal" Margin="2">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel>
+                            <!-- Click -->
+                            <GroupBox Header="Click Task" MinHeight="150" MinWidth="150" Margin="10,10,0,0" Padding="10">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Clicks:" Margin="2"/>
+                                        <TextBox x:Name="TB_Click" Margin="2" PreviewTextInput="Pos" TextChanged="Update"/>
+                                    </StackPanel>
+                                    <StackPanel x:Name="Stack_Delay" Orientation="Horizontal" Margin="2" Visibility="Collapsed">
+                                        <Label Content="Delay:" Margin="2"/>
+                                        <TextBox x:Name="TB_Click_Delay" Margin="2" PreviewTextInput="Pos" TextChanged="Update"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <ToggleButton x:Name="Tog_Click" Style="{StaticResource ClickToggle}" Width="30" Margin="2"/>
+                                        <Image x:Name="imgLeft" Source=""></Image>
+                                        <Image x:Name="imgRight" Source=""></Image>
+                                    </StackPanel>
+                                    <Button x:Name="btn_Click" Content="Add Click" Margin="2" Click="btn_AddClick"/>
+                                </StackPanel>
+                            </GroupBox>
 
-            <Button x:Name="btn_Delay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Delay" FontSize="15" Click="btn_AddDelay"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Min:" FontSize="15"/>
-            <TextBox x:Name="tb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Sec:" FontSize="15"/>
-            <TextBox x:Name="tb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+                            <!-- Delay -->
+                            <GroupBox Header="Delay Task" Margin="10,0,0,0" Padding="10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Min:" Margin="2"/>
+                                        <TextBox x:Name="tb_dmin" Margin="2"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Sec:" Margin="2"/>
+                                        <TextBox x:Name="tb_dsec" Margin="2"/>
+                                    </StackPanel>
+                                    <Button x:Name="btn_Delay" Content="Add Delay" Margin="2" HorizontalAlignment="Right" Click="btn_AddClick"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                        <StackPanel>
+                            <!-- Move -->
+                            <GroupBox Header="Move Task" Margin="10,0,0,0" Padding="10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="X:" Margin="2"/>
+                                        <TextBox x:Name="TB_X" Margin="2"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Y:" Margin="2"/>
+                                        <TextBox x:Name="TB_Y" Margin="2"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Button x:Name="btn_Test" Margin="2" Content="Test" Click="btn_Test_Click"/>
+                                        <Button x:Name="btn_Auto" Margin="2" Content="Auto" Click="btn_Auto_Click"/>
+                                    </StackPanel>
+                                    <Button x:Name="btn_Move" Margin="2" Content="Add Move" Click="btn_AddMove"/>
+                                </StackPanel>
+                            </GroupBox>
 
-            <Button x:Name="btn_Move" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Move" FontSize="15" Click="btn_AddMove"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,67,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="X:" FontSize="15"/>
-            <TextBox x:Name="TB_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,71,0,0" Width="50" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,67,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="Y:" FontSize="15"/>
-            <TextBox x:Name="TB_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,71,0,0" Width="50" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
+                            <!-- Timed -->
+                            <GroupBox Header="Timed Task" Margin="10,0,0,0" Padding="10">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Min:" Margin="2"/>
+                                        <TextBox x:Name="tb_min" Margin="2"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Label Content="Sec:" Margin="2"/>
+                                        <TextBox x:Name="tb_sec" Margin="2"/>
+                                    </StackPanel>
+                                    <Button x:Name="btn_Timed" Margin="2" Content="Time" Click="btn_AddTimed"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </StackPanel>
 
-            <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="80,100,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
-            <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="140,100,0,0" Width="50" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
+                    <StackPanel Orientation="Horizontal">
+                        
+                    <!-- Control -->
+                    <GroupBox Header="Control" Margin="10,0,0,0" Padding="10">
+                        <StackPanel>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <Label ToolTip="Can not be negative" Content="Total repeats:" Margin="2"/>
+                                    <TextBox x:Name="TB_Repeats" Width="50" Margin="2" ToolTip="Must be >0" PreviewTextInput="Pos" TextChanged="Update"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2">
+                                    <ToggleButton x:Name="Tog_Inf" Style="{StaticResource Infinite}" Width="25" Margin="2" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
+                                    <Button x:Name="btn_Start" Margin="2" Content="Run x times" Click="btn_Start_Click"/>
+                                </StackPanel>
+                            </StackPanel>
 
-            <Button x:Name="btn_Timed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,130,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Time" FontSize="15" Click="btn_AddTimed"/> 
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,127,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Min:" FontSize="15" />
-            <TextBox x:Name="tb_min" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="95,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" />
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150,127,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Sec:" FontSize="15" />
-            <TextBox x:Name="tb_sec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="185,131,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update" /> 
-
-            <Button x:Name="btn_Start" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,160,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Start" FontSize="15" Click="btn_Start_Click"/>
-            <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="60,157,0,0" Focusable="False" ToolTip="Can not be negative" Content="Total repeats:" FontSize="15"/>
-            <TextBox x:Name="TB_Repeats" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="155,161,0,0" Width="50" ToolTip="Must be >0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
-            <ToggleButton x:Name="Tog_Inf" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="210,161,0,0" Height="22" Width="22" Focusable="False" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?">
-                <ToggleButton.Template>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Rectangle Stroke="Gray" StrokeThickness="1" Fill="{TemplateBinding Background}"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="YellowGreen"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter Property="Background" Value="LightCoral"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Cursor" Value="Hand"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </ToggleButton.Template>
-            </ToggleButton>
-
-            <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,90" Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10"/>
-
-            <Button x:Name="btn_Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,20" Width="50" Focusable="False" IsEnabled="False" Content="Delete" FontSize="15" Click="btn_Delete_Click"/>
-            <Button x:Name="btn_Reset" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,50" Width="50" Focusable="False" Content="Reset" FontSize="15" Click="btn_Reset_Click"/>
-            <Button x:Name="btn_Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,110" Width="50" Focusable="False" IsEnabled="False" Content="Save" FontSize="15" Click="btn_Save_Click"/>
-            <Button x:Name="btn_Load" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,180,80" Width="50" Focusable="False" Content="Load" FontSize="15" Click="btn_Load_Click"/>
-            <TextBlock x:Name="Status" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Height="75" Width="200" Focusable="False" TextWrapping="Wrap" Text="Status" FontSize="10"/>
-            <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" Height="380" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" 
-                      ItemsSource="{Binding sequence}"
-                      AllowDrop="True"
-                      SelectionChanged="LB_Seq_SelectionChanged" 
-                      PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" 
-                      MouseMove="LB_Seq_MouseMove" 
-                      DragOver="LB_Seq_DragOver"
-                      Drop="LB_Seq_Drop">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding DisplayText}" />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <EventSetter Event="MouseDoubleClick" Handler="LB_Seq_MouseDoubleClick"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Button x:Name="btn_Delete" Margin="2" Content="Delete" Click="btn_Delete_Click"/>
+                                <Button x:Name="btn_Reset" Margin="2" Content="Reset" Click="btn_Reset_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Button x:Name="btn_Save" Margin="2" Content="Save" Click="btn_Save_Click"/>
+                                <Button x:Name="btn_Load" Margin="2" Content="Load" Click="btn_Load_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                        <Label Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10" Margin="10,0,0,0"/>
+                        <TextBlock x:Name="Status" TextWrapping="Wrap" Text="Status" FontSize="10" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                    
+                <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" MinHeight="100" MaxHeight="750" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" 
+                    ItemsSource="{Binding sequence}"
+                    AllowDrop="True"
+                    SelectionChanged="LB_Seq_SelectionChanged" 
+                    PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" 
+                    MouseMove="LB_Seq_MouseMove" 
+                    DragOver="LB_Seq_DragOver"
+                    Drop="LB_Seq_Drop">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayText}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="LB_Seq_MouseDoubleClick"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                
+            </StackPanel>
+            
         </Grid>
     </Viewbox>
 </Window>

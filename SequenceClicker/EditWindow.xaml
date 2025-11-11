@@ -11,32 +11,32 @@
         Title="Edit" Height="360" Width="390">
     <Viewbox>
         <Grid Height="170" Width="195">
-            <Label x:Name="lb_EditClick" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Click" FontSize="15"/>
-            <Label x:Name="lb_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="If >1 fill in the Delay values" Content="Click repeats:" FontSize="15"/>
-            <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="105,41,0,0" Width="50" IsEnabled="False" ToolTip="Must be &gt;0" FontSize="15" PreviewTextInput="Pos" TextChanged="Update"/>
+            <Label x:Name="lb_EditClick" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Click" />
+            <Label x:Name="lb_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="If >1 fill in the Delay values" Content="Click repeats:" />
+            <TextBox x:Name="TB_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="105,41,0,0" Width="50" IsEnabled="False" ToolTip="Must be &gt;0" PreviewTextInput="Pos" TextChanged="Update"/>
             <ToggleButton x:Name="Tog_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="160,41,0,0" Height="22" Width="22" IsEnabled="False" Focusable="False" ToolTip="Rightclick?" Click="Tog_Clicked"/>
 
-            <Label x:Name="lb_EditDelay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Delay" FontSize="15"/>
-            <Label x:Name="lb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Min:" FontSize="15"/>
-            <TextBox x:Name="tb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
-            <Label x:Name="lb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Sec:" FontSize="15"/>
-            <TextBox x:Name="tb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label x:Name="lb_EditDelay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Delay" />
+            <Label x:Name="lb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Min:" />
+            <TextBox x:Name="tb_dmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,41,0,0" Width="50" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label x:Name="lb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,37,0,0" Focusable="False" ToolTip="Can not be less then 1ms" Content="Sec:" />
+            <TextBox x:Name="tb_dsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,41,0,0" Width="50" PreviewTextInput="PosDeci" TextChanged="Update"/>
             
-            <Label x:Name="lb_EditMove" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Move" FontSize="15"/>
-            <Label x:Name="lb_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="X:" FontSize="15"/>
-            <TextBox x:Name="TB_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,41,0,0" Width="50" IsEnabled="False" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
-            <Label x:Name="lb_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="85,37,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="Y:" FontSize="15"/>
-            <TextBox x:Name="TB_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="105,41,0,0" Width="50" IsEnabled="False" FontSize="15" PreviewTextInput="PosNeg" TextChanged="Update"/>
-            <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" FontSize="15" Click="btn_Test_Click"/>
-            <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Auto" FontSize="15" Click="btn_Auto_Click"/>
+            <Label x:Name="lb_EditMove" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Move" />
+            <Label x:Name="lb_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="X:" />
+            <TextBox x:Name="TB_X" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,41,0,0" Width="50" IsEnabled="False" PreviewTextInput="PosNeg" TextChanged="Update"/>
+            <Label x:Name="lb_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="85,37,0,0" Focusable="False" ToolTip="Try to stay inbounds" Content="Y:" />
+            <TextBox x:Name="TB_Y" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="105,41,0,0" Width="50" IsEnabled="False" PreviewTextInput="PosNeg" TextChanged="Update"/>
+            <Button x:Name="btn_Test" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Test" Click="btn_Test_Click"/>
+            <Button x:Name="btn_Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,70,0,0" Width="50" IsEnabled="False" Focusable="False" Content="Auto" Click="btn_Auto_Click"/>
 
-            <Label x:Name="lb_TimedDelay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Timrd" FontSize="15"/>
-            <Label x:Name="lb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" Content="Min:" FontSize="15"/>
-            <TextBox x:Name="tb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
-            <Label x:Name="lb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,37,0,0" Focusable="False" Content="Sec:" FontSize="15"/>
-            <TextBox x:Name="tb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,41,0,0" Width="50" FontSize="15" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label x:Name="lb_TimedDelay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Focusable="False" Content="Edit Timrd" />
+            <Label x:Name="lb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,37,0,0" Focusable="False" Content="Min:" />
+            <TextBox x:Name="tb_tmin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,41,0,0" Width="50" PreviewTextInput="PosDeci" TextChanged="Update"/>
+            <Label x:Name="lb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,37,0,0" Focusable="False" Content="Sec:" />
+            <TextBox x:Name="tb_tsec" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,41,0,0" Width="50" PreviewTextInput="PosDeci" TextChanged="Update"/>
 
-            <Button x:Name="OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="30" Focusable="False" IsEnabled="False" Content="OK" FontSize="15" Click="OK_Click"/>
+            <Button x:Name="OK" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="30" Focusable="False" IsEnabled="False" Content="OK" Click="OK_Click"/>
         </Grid>
     </Viewbox>
 </Window>

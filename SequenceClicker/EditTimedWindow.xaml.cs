@@ -1,22 +1,11 @@
-﻿using Microsoft.Win32;
-using SequenceClicker.Tasks;
-using System;
-using System.Collections.Generic;
+﻿using SequenceClicker.Tasks;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SequenceClicker
 {
@@ -28,7 +17,7 @@ namespace SequenceClicker
         #region DLL imports
         [DllImport("user32.dll")]
         static extern bool SetCursorPos(int X, int Y);
-        
+
         [DllImport("user32.dll")]
         static extern bool GetCursorPos(out POINT lpPoint);
 
@@ -209,7 +198,7 @@ namespace SequenceClicker
             }
             Update();
         }
-        
+
         /// <summary>
         /// Moves the cursor to the given position
         /// </summary>
@@ -383,11 +372,11 @@ namespace SequenceClicker
         /// <author>CC-7956</author>
         private void Update()
         {
-           
+
             Check_Move();
             Check_Delay();
             Check_Click();
-            if(TimedTask.ValidInput(tb_min.Text, tb_sec.Text) && _sequence.Count != 0)
+            if (TimedTask.ValidInput(tb_min.Text, tb_sec.Text) && _sequence.Count != 0)
             {
                 btn_Ok.IsEnabled = true;
             }

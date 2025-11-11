@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Windows.Controls;
 
 namespace SequenceClicker.Tasks
 {
