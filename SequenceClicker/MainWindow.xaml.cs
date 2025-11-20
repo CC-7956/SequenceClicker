@@ -88,6 +88,7 @@ namespace SequenceClicker
         private bool _isRunning = false;
         private bool _editRunning = false;
         private bool _saved = false;
+        private bool _leftClick = true;
 
         private CancellationTokenSource _cts;
         private CancellationTokenSource _ctsTimed;
@@ -109,6 +110,9 @@ namespace SequenceClicker
             InitializeComponent();
             LB_Seq.ItemsSource = _sequence;
             LB_Seq.PreviewDragLeave += LB_Seq_PreviewDragLeave;
+            NumberBox.AttachHandlers(TB_Click);
+            NumberBox.AttachHandlers(TB_CDMin);
+            NumberBox.AttachHandlers(TB_CDSec);
         }
 
         #region Functionallity
@@ -276,7 +280,6 @@ namespace SequenceClicker
         private void btn_AddClick(object sender, RoutedEventArgs e)
         {
             ClickTask t;
-            bool left = Tog_Click.IsChecked == true ? false : true;
             int delay = -1;
 
             if (int.TryParse(TB_Click.Text.Trim(), out int rep) && rep > 1)
@@ -309,11 +312,11 @@ namespace SequenceClicker
                     MessageBox.Show("Screenshot this error\n" + ex.Message, "Error while adding Click Task", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 delay = (int)((min * 60 + sec) * 1000);
-                t = new ClickTask(left, rep, delay);
+                t = new ClickTask(_leftClick, rep, delay);
             }
             else
             {
-                t = new ClickTask(left);
+                t = new ClickTask(_leftClick);
             }
             _sequence.Add(t);
             Status.Text = $"{t} was added";
@@ -621,9 +624,63 @@ namespace SequenceClicker
         /// Checks if the input for the Click Task is valid and enables/disables the add button
         /// </summary>
         /// <author>CC-7956</author>
-        private void Check_Click()
+        private void ValidateClickTask()
         {
-            btn_Click.IsEnabled = ClickTask.ValidInput(TB_Click.Text, btn_Delay.IsEnabled);
+            bool valid = false;
+            string content = TB_Click.Text.Trim();
+            if (uint.TryParse(content, out uint repeats))
+            {
+                valid = true;
+                TB_Click.BorderBrush = Brushes.DarkGray;
+                TB_CDMin.IsEnabled = false;
+                TB_CDSec.IsEnabled = false;
+                TB_CDMin.BorderBrush = Brushes.DarkGray;
+                TB_CDSec.BorderBrush = Brushes.DarkGray;
+                if (repeats > 1)
+                {
+                    valid = false;
+                    TB_CDMin.IsEnabled = true;
+                    TB_CDSec.IsEnabled = true;
+                    TB_CDMin.BorderBrush = Brushes.Red;
+                    TB_CDSec.BorderBrush = Brushes.Red;
+
+
+                    if ((double.TryParse(TB_CDSec.Text.Trim(), out double sec) ? sec : 0) > 0 && (double.TryParse(TB_CDMin.Text.Trim(), out double min) ? min : 0) > 0)
+                    {
+
+                        valid = true;
+                        TB_CDMin.BorderBrush = Brushes.DarkGray;
+                        TB_CDSec.BorderBrush = Brushes.DarkGray;
+
+                    }
+                    else
+                    {
+                        valid = false;
+                        if ((double.TryParse(TB_CDSec.Text.Trim(), out sec) ? sec : 0) > 0)
+                        {
+                            TB_CDSec.BorderBrush = Brushes.Red;
+                        }
+                        if ((double.TryParse(TB_CDMin.Text.Trim(), out min) ? min : 0) > 0)
+                        {
+                            TB_CDMin.BorderBrush = Brushes.Red;
+                        }
+                    }
+                }
+                if (repeats < 1)
+                {
+                    valid = false;
+                    TB_Click.BorderBrush = Brushes.Red;
+                    TB_CDMin.IsEnabled = false;
+                    TB_CDSec.IsEnabled = false;
+                }
+            }
+            else
+            {
+                TB_Click.BorderBrush = Brushes.Red;
+                TB_CDMin.IsEnabled = false;
+                TB_CDSec.IsEnabled = false;
+            }
+            btn_Click.IsEnabled = valid;
         }
 
         /// <summary>
@@ -756,7 +813,7 @@ namespace SequenceClicker
             }
             Check_Move();
             Check_Delay();
-            Check_Click();
+            ValidateClickTask();
             Check_Repeat();
             Check_Timed();
         }
@@ -1150,5 +1207,24 @@ namespace SequenceClicker
             _currentDropTarget = (null, false, -1);
         }
         #endregion
+
+        private void Tog_Clicked(object sender, RoutedEventArgs e)
+        {
+            _leftClick = !_leftClick;
+            if (_leftClick == false)
+            {
+                //rightclick
+                IMGmouse.RenderTransformOrigin = new Point(0.5, 0.5);
+                IMGmouse.RenderTransform = new ScaleTransform(1, 1);
+                Tog_Click.Content = "Rightclick";
+            }
+            else
+            {
+                //leftclick
+                IMGmouse.RenderTransformOrigin = new Point(0.5, 0.5);
+                IMGmouse.RenderTransform = new ScaleTransform(-1, 1);
+                Tog_Click.Content = "Leftclick";
+            }
+        }
     }
 }

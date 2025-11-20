@@ -9,122 +9,135 @@
         Title="Super Cooler Sequenzen Clicker">
     <Viewbox>
         <Grid>
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel>
-                            <!-- Click -->
-                            <GroupBox Header="Click Task" MinHeight="150" MinWidth="150" Margin="10,10,0,0" Padding="10">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Clicks:" Margin="2"/>
-                                        <TextBox x:Name="TB_Click" Margin="2" PreviewTextInput="Pos" TextChanged="Update"/>
-                                    </StackPanel>
-                                    <StackPanel x:Name="Stack_Delay" Orientation="Horizontal" Margin="2" Visibility="Collapsed">
-                                        <Label Content="Delay:" Margin="2"/>
-                                        <TextBox x:Name="TB_Click_Delay" Margin="2" PreviewTextInput="Pos" TextChanged="Update"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <ToggleButton x:Name="Tog_Click" Style="{StaticResource ClickToggle}" Width="30" Margin="2"/>
-                                        <Image x:Name="imgLeft" Source=""></Image>
-                                        <Image x:Name="imgRight" Source=""></Image>
-                                    </StackPanel>
-                                    <Button x:Name="btn_Click" Content="Add Click" Margin="2" Click="btn_AddClick"/>
-                                </StackPanel>
-                            </GroupBox>
-
-                            <!-- Delay -->
-                            <GroupBox Header="Delay Task" Margin="10,0,0,0" Padding="10">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Min:" Margin="2"/>
-                                        <TextBox x:Name="tb_dmin" Margin="2"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Sec:" Margin="2"/>
-                                        <TextBox x:Name="tb_dsec" Margin="2"/>
-                                    </StackPanel>
-                                    <Button x:Name="btn_Delay" Content="Add Delay" Margin="2" HorizontalAlignment="Right" Click="btn_AddClick"/>
-                                </StackPanel>
-                            </GroupBox>
+            <!-- Click -->
+            <GroupBox Header="Click Task" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="10">
+                <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <Label Content="Clicks:" Margin="2"/>
+                        <TextBox x:Name="TB_Click" Margin="2" local:NumberBox.Mode="PositiveInteger" TextChanged="Update"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,35,0,0" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                            <Label Content="Min:" Margin="2"/>
+                            <TextBox x:Name="TB_CDMin" Margin="2" IsEnabled="False" local:NumberBox.Mode="PositiveDecimal" TextChanged="Update"/>
                         </StackPanel>
-                        <StackPanel>
-                            <!-- Move -->
-                            <GroupBox Header="Move Task" Margin="10,0,0,0" Padding="10">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="X:" Margin="2"/>
-                                        <TextBox x:Name="TB_X" Margin="2"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Y:" Margin="2"/>
-                                        <TextBox x:Name="TB_Y" Margin="2"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Button x:Name="btn_Test" Margin="2" Content="Test" Click="btn_Test_Click"/>
-                                        <Button x:Name="btn_Auto" Margin="2" Content="Auto" Click="btn_Auto_Click"/>
-                                    </StackPanel>
-                                    <Button x:Name="btn_Move" Margin="2" Content="Add Move" Click="btn_AddMove"/>
-                                </StackPanel>
-                            </GroupBox>
-
-                            <!-- Timed -->
-                            <GroupBox Header="Timed Task" Margin="10,0,0,0" Padding="10">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Min:" Margin="2"/>
-                                        <TextBox x:Name="tb_min" Margin="2"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Label Content="Sec:" Margin="2"/>
-                                        <TextBox x:Name="tb_sec" Margin="2"/>
-                                    </StackPanel>
-                                    <Button x:Name="btn_Timed" Margin="2" Content="Time" Click="btn_AddTimed"/>
-                                </StackPanel>
-                            </GroupBox>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                            <Label Content="Sec:" Margin="2"/>
+                            <TextBox x:Name="TB_CDSec" Margin="2" IsEnabled="False" local:NumberBox.Mode="SignedInteger" TextChanged="Update"/>
                         </StackPanel>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,70,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <Button x:Name="Tog_Click" Content="Leftclick" Margin="2" Click="Tog_Clicked" Width="80"/>
+                        <Image x:Name="IMGmouse" Source="/assets/mouse.png" Height="30" Margin="2" RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <ScaleTransform ScaleX="-1" />
+                            </Image.RenderTransform>
+                        </Image>
+                    </StackPanel>
+                    <Button x:Name="btn_Click" Content="Add Click" IsEnabled="False" Margin="0,110,0,0" HorizontalAlignment="Right" Click="btn_AddClick"/>
+                </Grid>
+            </GroupBox>
 
-                    <StackPanel Orientation="Horizontal">
-                        
-                    <!-- Control -->
-                    <GroupBox Header="Control" Margin="10,0,0,0" Padding="10">
+            <!-- Delay -->
+            <GroupBox Header="Delay Task" Margin="10,160,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="10" Visibility="Hidden">
                         <StackPanel>
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <Label ToolTip="Can not be negative" Content="Total repeats:" Margin="2"/>
-                                    <TextBox x:Name="TB_Repeats" Width="50" Margin="2" ToolTip="Must be >0" PreviewTextInput="Pos" TextChanged="Update"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2">
-                                    <ToggleButton x:Name="Tog_Inf" Style="{StaticResource Infinite}" Width="25" Margin="2" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
-                                    <Button x:Name="btn_Start" Margin="2" Content="Run x times" Click="btn_Start_Click"/>
-                                </StackPanel>
-                            </StackPanel>
-
                             <StackPanel Orientation="Horizontal" Margin="2">
-                                <Button x:Name="btn_Delete" Margin="2" Content="Delete" Click="btn_Delete_Click"/>
-                                <Button x:Name="btn_Reset" Margin="2" Content="Reset" Click="btn_Reset_Click"/>
+                                <Label Content="Min:" Margin="2"/>
+                                <TextBox x:Name="tb_dmin" Margin="2"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="2">
-                                <Button x:Name="btn_Save" Margin="2" Content="Save" Click="btn_Save_Click"/>
-                                <Button x:Name="btn_Load" Margin="2" Content="Load" Click="btn_Load_Click"/>
+                                <Label Content="Sec:" Margin="2"/>
+                                <TextBox x:Name="tb_dsec" Margin="2"/>
                             </StackPanel>
+                            <Button x:Name="btn_Delay" Content="Add Delay" Margin="2" HorizontalAlignment="Right" Click="btn_AddClick"/>
                         </StackPanel>
                     </GroupBox>
-                        <Label Content="STRG + F6: Start autoclicker&#xA;STRG + F7: Cancel autoclicker&#xA;ALT + F7: Exit Application" FontSize="10" Margin="10,0,0,0"/>
-                        <TextBlock x:Name="Status" TextWrapping="Wrap" Text="Status" FontSize="10" Margin="10,0,0,0"/>
-                    </StackPanel>
-                </StackPanel>
-                
-                    
-                <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" MinHeight="100" MaxHeight="750" Margin="0,10,10,0" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" 
+                    <!-- Move -->
+            <GroupBox Header="Move Task" Margin="10,0,0,0" Padding="10" Visibility="Hidden">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Label Content="X:" Margin="2"/>
+                                <TextBox x:Name="TB_X" Margin="2"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Label Content="Y:" Margin="2"/>
+                                <TextBox x:Name="TB_Y" Margin="2"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Button x:Name="btn_Test" Margin="2" Content="Test" Click="btn_Test_Click"/>
+                                <Button x:Name="btn_Auto" Margin="2" Content="Auto" Click="btn_Auto_Click"/>
+                            </StackPanel>
+                            <Button x:Name="btn_Move" Margin="2" Content="Add Move" HorizontalAlignment="Right" Click="btn_AddMove"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Timed -->
+            <GroupBox Header="Timed Task" Margin="10,0,0,0" Padding="10" Visibility="Hidden">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Label Content="Min:" Margin="2"/>
+                                <TextBox x:Name="tb_min" Margin="2"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <Label Content="Sec:" Margin="2"/>
+                                <TextBox x:Name="tb_sec" Margin="2"/>
+                            </StackPanel>
+                            <Button x:Name="btn_Timed" Margin="2" Content="Time" HorizontalAlignment="Right" Click="btn_AddTimed"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                        <!-- Control -->
+            <GroupBox Header="Control" Margin="10,0,0,0" Padding="10" Visibility="Hidden">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="2">
+                                            <Label ToolTip="Can not be negative" Content="Total repeats:" Margin="2"/>
+                                            <TextBox x:Name="TB_Repeats" Width="50" Margin="2" ToolTip="Must be >0" PreviewTextInput="Pos" TextChanged="Update"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="2">
+                                            <ToggleButton x:Name="Tog_Inf" Style="{StaticResource Infinite}" Width="25" Margin="2" Click="Tog_Inf_Checked" ToolTip="Infinite repeats?"/>
+                                            <Button x:Name="btn_Start" Margin="2" Content="Run x times" Click="btn_Start_Click"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Button x:Name="btn_Delete" Margin="2" Content="Delete" Click="btn_Delete_Click"/>
+                                        <Button x:Name="btn_Reset" Margin="2" Content="Reset" Click="btn_Reset_Click"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <Button x:Name="btn_Save" Margin="2" Content="Save" Click="btn_Save_Click"/>
+                                        <Button x:Name="btn_Load" Margin="2" Content="Load" Click="btn_Load_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel>
+                                    <GroupBox Header="Start" Margin="2,0,0,0">
+                                        <Label Content="STRG + F6" FontSize="10" Margin="2"/>
+                                    </GroupBox>
+                                    <GroupBox Header="Stop" Margin="2,0,0,0">
+                                        <Label Content="STRG + F7" FontSize="10" Margin="2"/>
+                                    </GroupBox>
+                                    <GroupBox Header="Exit" Margin="2,0,0,0">
+                                        <Label Content="ALT + F6" FontSize="10" Margin="2"/>
+                                    </GroupBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+            <GroupBox Header="Status" Margin="10" MinHeight="75" MinWidth="200" Visibility="Hidden">
+                        <TextBlock x:Name="Status" TextWrapping="Wrap" FontSize="10" Margin="2"/>
+                    </GroupBox>
+
+
+            <GroupBox Header="Sequence" MinHeight="400" MinWidth="200" Margin="10" Padding="2" Visibility="Hidden">
+                <ListView x:Name="LB_Seq" HorizontalAlignment="Right" VerticalAlignment="Top" MinHeight="100" MaxHeight="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight}" Margin="10" ToolTip="Drag and Drop to change order" Width="150" Focusable="False" SelectionMode="Single" 
                     ItemsSource="{Binding sequence}"
                     AllowDrop="True"
                     SelectionChanged="LB_Seq_SelectionChanged" 
                     PreviewMouseLeftButtonDown="LB_Seq_PreviewMouseLeftButtonDown" 
                     MouseMove="LB_Seq_MouseMove" 
                     DragOver="LB_Seq_DragOver"
-                    Drop="LB_Seq_Drop">
+                    Drop="LB_Seq_Drop"
+                    BorderBrush="Transparent">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding DisplayText}" />
@@ -136,9 +149,7 @@
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
-                
-            </StackPanel>
-            
+            </GroupBox>
         </Grid>
     </Viewbox>
 </Window>

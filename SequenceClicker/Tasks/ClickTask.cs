@@ -90,6 +90,7 @@ namespace SequenceClicker.Tasks
             }
             return new ClickTask(saveTxt.Split(":")[1].ToLower() == "true" ? true : false);
         }
+        [Obsolete("New Method in MainWindow WIP")]
         public static bool ValidInput(string repeats, bool delay)
         {
             if (uint.TryParse(repeats.Trim(), out uint rep) && rep > 1 && !delay)

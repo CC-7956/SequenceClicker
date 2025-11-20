@@ -10,6 +10,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border 
+                        x:Name="border"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
@@ -19,14 +20,33 @@
                             HorizontalAlignment="Center" 
                             VerticalAlignment="Center"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- Disabled state -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="DarkGray"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="Gray"/>
+                            <Setter Property="Foreground" Value="LightGray"/>
+                        </Trigger>
+
+                        <!-- Optional: MouseOver -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="LightBlue"/>
+                        </Trigger>
+
+                        <!-- Optional: Pressed -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="DodgerBlue"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style TargetType="ToggleButton">
+    <Style x:Key="BaseToggleButton" TargetType="ToggleButton">
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Padding" Value="5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -44,40 +64,8 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ClickToggle" TargetType="ToggleButton">
-        <Setter Property="FontSize" Value="10"/>
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Grid>
-                        <Rectangle Stroke="Gray" StrokeThickness="1" Fill="{TemplateBinding Background}"/>
-                        <TextBlock x:Name="TXT" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,1,2" FontSize="20"/>
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="Khaki"/>
-                            <Setter Property="ToolTip" Value="Rightclick"/>
-                            <Setter TargetName="TXT" Property="Text" Value="R"/>
-                            <Setter TargetName="TXT" Property="Foreground" Value="#8C96F0"/>
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="False">
-                            <Setter Property="Background" Value="CornflowerBlue"/>
-                            <Setter Property="ToolTip" Value="Leftclick"/>
-                            <Setter TargetName="TXT" Property="Text" Value="L"/>
-                            <Setter TargetName="TXT" Property="Foreground" Value="#EDBC64"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Cursor" Value="Hand"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="Infinite" TargetType="ToggleButton">
+    <Style x:Key="Infinite" TargetType="ToggleButton" BasedOn="{StaticResource BaseToggleButton}">
+        <Setter Property="Padding" Value="5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -102,10 +90,12 @@
     </Style>
 
     <Style TargetType="TextBox">
+        <Setter Property="Height" Value="30"/>
         <Setter Property="MinWidth" Value="50"/>
         <Setter Property="MaxWidth" Value="200"/>
         <Setter Property="FontSize" Value="15"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -156,5 +146,6 @@
 
     <Style TargetType="Label">
         <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Height" Value="30"/>
     </Style>
 </ResourceDictionary>

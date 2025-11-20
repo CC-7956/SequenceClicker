@@ -14,4 +14,8 @@
 		<Copyright>CC7956</Copyright>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Resource Include="assets\mouse.png" />
+	</ItemGroup>
+
 </Project>
